@@ -5,11 +5,20 @@
 
 body {
   @apply m-0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
 code {
@@ -18,6 +27,10 @@ code {
 }
 
 @theme inline {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-heading: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -37,6 +50,8 @@ code {
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -57,71 +72,95 @@ code {
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* Warm cream background with subtle warmth */
+  --background: oklch(0.985 0.008 85);
+  --foreground: oklch(0.25 0.02 45);
+  /* Cards: Match the warm background instead of stark white */
+  --card: oklch(0.98 0.012 80);
+  --card-foreground: oklch(0.25 0.02 45);
+  --popover: oklch(0.98 0.012 80);
+  --popover-foreground: oklch(0.25 0.02 45);
+  /* Primary: Warm terracotta - earthy, homey, comforting */
+  --primary: oklch(0.55 0.14 35);
+  --primary-foreground: oklch(0.98 0.01 85);
+  /* Secondary: Soft warm sand/beige */
+  --secondary: oklch(0.92 0.025 75);
+  --secondary-foreground: oklch(0.35 0.04 45);
+  /* Muted: Warm gray with earthy undertones */
+  --muted: oklch(0.94 0.015 80);
+  --muted-foreground: oklch(0.5 0.02 55);
+  /* Accent: Warm amber glow */
+  --accent: oklch(0.88 0.06 70);
+  --accent-foreground: oklch(0.3 0.04 45);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Success: Warm sage green - earthy, natural */
+  --success: oklch(0.55 0.12 145);
+  --success-foreground: oklch(0.98 0.01 145);
+  /* Warm-tinted borders - slightly more visible */
+  --border: oklch(0.88 0.025 70);
+  --input: oklch(0.92 0.02 75);
+  --ring: oklch(0.6 0.12 40);
+  /* Charts with warm palette */
+  --chart-1: oklch(0.55 0.14 35);
+  --chart-2: oklch(0.65 0.12 55);
+  --chart-3: oklch(0.72 0.1 75);
+  --chart-4: oklch(0.78 0.08 90);
+  --chart-5: oklch(0.6 0.08 25);
+  /* Sidebar with subtle warm tint */
+  --sidebar: oklch(0.975 0.012 80);
+  --sidebar-foreground: oklch(0.25 0.02 45);
+  --sidebar-primary: oklch(0.55 0.14 35);
+  --sidebar-primary-foreground: oklch(0.98 0.01 85);
+  --sidebar-accent: oklch(0.92 0.035 65);
+  --sidebar-accent-foreground: oklch(0.3 0.04 40);
+  --sidebar-border: oklch(0.88 0.025 70);
+  --sidebar-ring: oklch(0.6 0.12 40);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* Deep warm charcoal background */
+  --background: oklch(0.18 0.015 50);
+  --foreground: oklch(0.94 0.01 80);
+  /* Warm dark cards */
+  --card: oklch(0.22 0.02 50);
+  --card-foreground: oklch(0.94 0.01 80);
+  --popover: oklch(0.22 0.02 50);
+  --popover-foreground: oklch(0.94 0.01 80);
+  /* Primary: Lighter terracotta for dark mode */
+  --primary: oklch(0.7 0.13 40);
+  --primary-foreground: oklch(0.18 0.02 45);
+  /* Secondary: Deep warm brown */
+  --secondary: oklch(0.28 0.03 50);
+  --secondary-foreground: oklch(0.92 0.01 80);
+  /* Muted: Warm dark gray */
+  --muted: oklch(0.28 0.02 55);
+  --muted-foreground: oklch(0.65 0.02 65);
+  /* Accent: Warm amber glow for dark */
+  --accent: oklch(0.32 0.04 55);
+  --accent-foreground: oklch(0.92 0.01 80);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Success: Lighter sage for dark mode */
+  --success: oklch(0.68 0.12 145);
+  --success-foreground: oklch(0.18 0.02 145);
+  /* Warm-tinted borders for dark */
+  --border: oklch(0.32 0.02 50);
+  --input: oklch(0.28 0.02 50);
+  --ring: oklch(0.65 0.1 40);
+  /* Charts with warm dark palette */
+  --chart-1: oklch(0.7 0.13 40);
+  --chart-2: oklch(0.68 0.1 60);
+  --chart-3: oklch(0.75 0.08 80);
+  --chart-4: oklch(0.72 0.12 50);
+  --chart-5: oklch(0.65 0.15 30);
+  /* Sidebar dark warm */
+  --sidebar: oklch(0.2 0.02 50);
+  --sidebar-foreground: oklch(0.94 0.01 80);
+  --sidebar-primary: oklch(0.7 0.13 40);
+  --sidebar-primary-foreground: oklch(0.18 0.02 45);
+  --sidebar-accent: oklch(0.28 0.04 55);
+  --sidebar-accent-foreground: oklch(0.92 0.01 80);
+  --sidebar-border: oklch(0.32 0.02 50);
+  --sidebar-ring: oklch(0.65 0.1 40);
 }
 
 @layer base {
