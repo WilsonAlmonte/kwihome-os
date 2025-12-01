@@ -13,6 +13,7 @@ export default class GetDashboardDataUseCase {
     const homeAreasStats = await this._homeAreasRepo.getStats();
     return {
       totalHomeAreas: homeAreasStats.total,
+      // This is a mock implementation that's temporary; replace with real data fetching logic
       outOfStockItems: 10,
       pendingTasks: 5,
       itemsInShoppingList: 8,
