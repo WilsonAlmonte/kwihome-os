@@ -59,3 +59,33 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model HomeArea
+ * 
+ */
+export type HomeArea = Prisma.HomeAreaModel
+/**
+ * Model InventoryItem
+ * 
+ */
+export type InventoryItem = Prisma.InventoryItemModel
+/**
+ * Model ShoppingList
+ * 
+ */
+export type ShoppingList = Prisma.ShoppingListModel
+/**
+ * Model ShoppingListItem
+ * 
+ */
+export type ShoppingListItem = Prisma.ShoppingListItemModel
+/**
+ * Model Task
+ * 
+ */
+export type Task = Prisma.TaskModel
+/**
+ * Model Note
+ * 
+ */
+export type Note = Prisma.NoteModel

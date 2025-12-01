@@ -75,3 +75,118 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+// Kwihome Models
+
+model HomeArea {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  inventoryItems   InventoryItem[]
+  shoppingListItems ShoppingListItem[]
+  tasks            Task[]
+  notes            Note[]
+
+  @@map("home_area")
+}
+
+enum InventoryStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+  NOT_NEEDED
+
+  @@map("inventory_status")
+}
+
+model InventoryItem {
+  id        String           @id @default(cuid())
+  name      String
+  status    InventoryStatus  @default(OUT_OF_STOCK)
+  areaId    String?
+  area      HomeArea?        @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  shoppingListItems ShoppingListItem[]
+
+  @@index([areaId])
+  @@map("inventory_item")
+}
+
+enum ShoppingListStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+
+  @@map("shopping_list_status")
+}
+
+model ShoppingList {
+  id          String              @id @default(cuid())
+  status      ShoppingListStatus  @default(DRAFT)
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  items ShoppingListItem[]
+
+  @@map("shopping_list")
+}
+
+model ShoppingListItem {
+  id              String        @id @default(cuid())
+  name            String
+  checked         Boolean       @default(false)
+  shoppingListId  String
+  shoppingList    ShoppingList  @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  inventoryItemId String?
+  inventoryItem   InventoryItem? @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+  areaId          String?
+  area            HomeArea?     @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+
+  @@index([shoppingListId])
+  @@index([inventoryItemId])
+  @@index([areaId])
+  @@map("shopping_list_item")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  completed   Boolean   @default(false)
+  areaId      String?
+  area        HomeArea? @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([areaId])
+  @@map("task")
+}
+
+model Note {
+  id        String    @id @default(cuid())
+  title     String
+  content   String    @db.Text
+  areaId    String?
+  area      HomeArea? @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([areaId])
+  @@map("note")
+}
