@@ -6,6 +6,9 @@ export const mockHomeAreasRepository: HomeAreasRepository = {
     return Promise.resolve([
       { id: "1", name: "Living Room" },
       { id: "2", name: "Kitchen" },
+      { id: "3", name: "Garage" },
+      { id: "4", name: "Bedroom" },
+      { id: "5", name: "Bathroom" },
     ]);
   },
   findById: function (_id: string): Promise<HomeArea | null> {
