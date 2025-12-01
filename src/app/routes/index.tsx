@@ -21,7 +21,7 @@ import { getContainer } from "@repo/di/container";
 const getHomePageData = createServerFn().handler(async () => {
   const { repos, useCases } = getContainer();
   const stats = await useCases.getDashboardData.execute();
-  const homeAreas = await repos.homeareas.findAll();
+  const homeAreas = await repos.homeAreas.findAll();
   return { homeAreas, stats };
 });
 

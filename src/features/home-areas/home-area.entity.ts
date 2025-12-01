@@ -1,4 +1,4 @@
-type HomeArea = {
+export type HomeArea = {
   id: string;
   name: string;
 };

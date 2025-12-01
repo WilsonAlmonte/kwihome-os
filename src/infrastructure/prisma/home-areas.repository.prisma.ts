@@ -1,4 +1,6 @@
 import { prisma } from "@repo/db";
+import { HomeArea } from "@repo/features/home-areas/home-area.entity";
+import { HomeAreasRepository } from "@repo/features/home-areas/home-areas.port";
 
 export const prismaHomeAreasRepository: HomeAreasRepository = {
   findAll: async function (): Promise<HomeArea[]> {

@@ -1,3 +1,6 @@
+import { HomeArea } from "@repo/features/home-areas/home-area.entity";
+import { HomeAreasRepository } from "@repo/features/home-areas/home-areas.port";
+
 export const mockHomeAreasRepository: HomeAreasRepository = {
   findAll: async function (): Promise<HomeArea[]> {
     return Promise.resolve([

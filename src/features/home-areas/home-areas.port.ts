@@ -1,4 +1,6 @@
-interface HomeAreasRepository {
+import { HomeArea } from "./home-area.entity";
+
+export interface HomeAreasRepository {
   findAll(): Promise<HomeArea[]>;
   findById(id: string): Promise<HomeArea | null>;
   create(name: string): Promise<HomeArea>;
