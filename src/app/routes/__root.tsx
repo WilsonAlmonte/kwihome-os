@@ -3,8 +3,10 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import appCss from "../styles.css?url";
+import { AppLayout } from "@app/components/layout";
 
 export const Route = createRootRoute({
+  component: AppLayout,
   head: () => ({
     meta: [
       {
