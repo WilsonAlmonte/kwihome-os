@@ -1,7 +1,7 @@
 import GetDashboardDataUseCase from "@repo/features/dashboard/get-dashboard-data.use-case";
 import { HomeAreasRepository } from "@repo/features/home-areas/home-areas.port";
 import { prismaHomeAreasRepository } from "@repo/infrastructure/prisma/home-areas.repository.prisma";
-import { mockHomeAreasRepository } from "@repo/test/mocks/home-reas.repository.mock";
+import { mockHomeAreasRepository } from "@repo/test/mocks/home-areas.repository.mock";
 
 // ============================================
 // REPOSITORY MOCK CONFIGURATION

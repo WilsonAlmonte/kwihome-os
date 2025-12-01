@@ -10,14 +10,14 @@ export const prismaHomeAreasRepository: HomeAreasRepository = {
     });
   },
   findById: function (id: string): Promise<HomeArea | null> {
-    return prisma.homeArea.findUnique({ where: { id, deletedAt: null } });
+    return prisma.homeArea.findFirst({ where: { id, deletedAt: null } });
   },
   create: function (name: string): Promise<HomeArea> {
     return prisma.homeArea.create({ data: { name } });
   },
   update: function (id: string, name: string): Promise<HomeArea> {
     return prisma.homeArea.update({
-      where: { id, deletedAt: null },
+      where: { id },
       data: { name },
     });
   },
