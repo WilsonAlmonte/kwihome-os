@@ -29,6 +29,9 @@ importers:
       '@tanstack/react-devtools':
         specifier: ^0.7.0
         version: 0.7.11(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(csstype@3.2.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.10)
+      '@tanstack/react-query':
+        specifier: ^5.90.11
+        version: 5.90.11(react@19.2.0)
       '@tanstack/react-router':
         specifier: ^1.132.0
         version: 1.139.7(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -83,6 +86,9 @@ importers:
       vite-tsconfig-paths:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.9.3)(vite@7.2.4(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.6))
+      zod:
+        specifier: ^4.1.13
+        version: 4.1.13
     devDependencies:
       '@tanstack/devtools-vite':
         specifier: ^0.3.11

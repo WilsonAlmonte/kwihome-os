@@ -8,7 +8,7 @@ import { mockHomeAreasRepository } from "@repo/test/mocks/home-areas.repository.
 // Toggle: true = mock, false = real (Prisma)
 // ============================================
 const USE_MOCK = {
-  homeAreas: true,
+  homeAreas: false,
   // inventory: true,
   // tasks: false,
   // shoppingList: true,

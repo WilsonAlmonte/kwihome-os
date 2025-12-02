@@ -231,7 +231,7 @@ function HomePage() {
           <BarChart3 className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold">At a Glance</h2>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           <Link to="/inventory">
             <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
               <CardHeader className="pb-2">
