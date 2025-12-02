@@ -9,6 +9,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import appCss from "../styles.css?url";
 import { AppLayout } from "@app/components/layout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@app/components/ui/sonner";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -61,6 +62,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={Route.useRouteContext().queryClient}>
           {children}
         </QueryClientProvider>
+        <Toaster />
         <TanStackDevtools
           config={{
             position: "bottom-right",
