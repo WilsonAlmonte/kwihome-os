@@ -21,18 +21,28 @@ import {
 import { Button } from "@app/components/ui/button";
 import { createServerFn } from "@tanstack/react-start";
 import { getContainer } from "@repo/di/container";
+import { homeAreasQueryOptions } from "../features/home-areas/home-areas.query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useHomeAreaCreation,
+  useHomeAreaUpdate,
+} from "../features/home-areas/home-areas.hooks";
+import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
+import { HomeAreaForm } from "@app/components/forms";
+import { toast } from "sonner";
+import { HomeArea } from "@repo/features/home-areas/home-area.entity";
 
 const getHomePageData = createServerFn().handler(async () => {
-  const { repos, useCases } = getContainer();
+  const { useCases } = getContainer();
   const stats = await useCases.getDashboardData.execute();
-  const homeAreas = await repos.homeAreas.findAll();
-  return { homeAreas, stats };
+  return { stats };
 });
 
 export const Route = createFileRoute("/")({
   component: HomePage,
-  loader: async () => {
+  loader: async ({ context }) => {
     const data = await getHomePageData();
+    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
     return { ...data };
   },
 });
@@ -77,8 +87,42 @@ const quickAccessItems = [
 const MAX_VISIBLE_AREAS = 4;
 
 function HomePage() {
-  const { homeAreas, stats } = Route.useLoaderData();
+  const createHomeArea = useHomeAreaCreation();
+  const updateHomeArea = useHomeAreaUpdate();
+  const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
+  const { stats } = Route.useLoaderData();
   const [showAllAreas, setShowAllAreas] = useState(false);
+  const [addDialogProps, setAddDialogProps] = useState<{
+    isOpen: boolean;
+    initialData?: HomeArea;
+  }>({
+    isOpen: false,
+  });
+
+  const handleHomeAreaSubmit = async (data: { name: string }) => {
+    try {
+      if (addDialogProps.initialData) {
+        await updateHomeArea.mutateAsync({
+          id: addDialogProps.initialData.id,
+          name: data.name,
+        });
+        toast.success("Home area updated", {
+          description: `${data.name} has been updated.`,
+        });
+      } else {
+        await createHomeArea.mutateAsync(data.name);
+        toast.success("Home area created", {
+          description: `${data.name} has been added to your home areas.`,
+        });
+      }
+      setAddDialogProps({ isOpen: false, initialData: undefined });
+    } catch (error) {
+      toast.error("Failed to create home area", {
+        description:
+          "Please try again or contact support if the problem persists.",
+      });
+    }
+  };
 
   // Get time-based greeting
   const getGreeting = () => {
@@ -167,7 +211,12 @@ function HomePage() {
             )}
           </div>
           {homeAreas.length > 0 && (
-            <Button variant="ghost" size="sm" className="gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1"
+              onClick={() => setAddDialogProps({ isOpen: true })}
+            >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Add Area</span>
             </Button>
@@ -179,6 +228,14 @@ function HomePage() {
             <div className="grid gap-2">
               {visibleAreas.map((area) => (
                 <Card
+                  role="button"
+                  tabIndex={0}
+                  onClick={() =>
+                    setAddDialogProps({
+                      isOpen: true,
+                      initialData: { ...area },
+                    })
+                  }
                   key={area.id}
                   className="cursor-pointer transition-all hover:shadow-sm active:scale-[0.99] hover:border-primary/50"
                 >
@@ -216,7 +273,11 @@ function HomePage() {
                 Start by adding the rooms and spaces you use most, like Kitchen,
                 Living Room, or Garage.
               </p>
-              <Button size="sm" className="gap-1.5">
+              <Button
+                size="sm"
+                className="gap-1.5"
+                onClick={() => setAddDialogProps({ isOpen: true })}
+              >
                 <Plus className="h-4 w-4" />
                 Add your first area
               </Button>
@@ -225,6 +286,23 @@ function HomePage() {
         )}
       </section>
 
+      {/* Add Home Area Dialog */}
+      <ResponsiveDialog
+        open={addDialogProps.isOpen}
+        onOpenChange={(open) => setAddDialogProps({ isOpen: open })}
+        title="Add Home Area"
+        description="Create a new area to organize your home better."
+      >
+        <HomeAreaForm
+          initialData={addDialogProps.initialData}
+          onSubmit={handleHomeAreaSubmit}
+          onCancel={() =>
+            setAddDialogProps({ isOpen: false, initialData: undefined })
+          }
+          isSubmitting={createHomeArea.isPending || updateHomeArea.isPending}
+        />
+      </ResponsiveDialog>
+
       {/* Summary Stats */}
       <section>
         <div className="flex items-center gap-2 mb-4">
@@ -232,22 +310,28 @@ function HomePage() {
           <h2 className="text-lg font-semibold">At a Glance</h2>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          <Link to="/inventory">
-            <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Home Areas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {stats.totalHomeAreas > 0 ? (
-                  <p className="text-2xl font-bold">{stats.totalHomeAreas}</p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Add areas →</p>
-                )}
-              </CardContent>
-            </Card>
-          </Link>
+          <Card
+            role="button"
+            onClick={
+              stats.totalHomeAreas === 0
+                ? () => setAddDialogProps({ isOpen: true })
+                : () => {}
+            }
+            className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Home Areas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats.totalHomeAreas > 0 ? (
+                <p className="text-2xl font-bold">{stats.totalHomeAreas}</p>
+              ) : (
+                <a className="text-sm text-muted-foreground">Add areas →</a>
+              )}
+            </CardContent>
+          </Card>
 
           <Link to="/shopping">
             <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">

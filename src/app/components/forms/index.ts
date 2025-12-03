@@ -19,3 +19,6 @@ export {
 export { Input } from "@app/components/ui/input";
 export { Label } from "@app/components/ui/label";
 export { Button } from "@app/components/ui/button";
+
+// Domain Forms
+export { HomeAreaForm } from "./home-area-form";
