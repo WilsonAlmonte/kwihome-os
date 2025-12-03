@@ -28,10 +28,12 @@ import {
   useHomeAreaDeletion,
 } from "../features/home-areas/home-areas.hooks";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
+import { Swipeable } from "@app/components/ui/swipeable";
 import { HomeAreaForm } from "@app/components/forms";
 import { toast } from "sonner";
 import { HomeArea } from "@repo/features/home-areas/home-area.entity";
 import { dashboardDataQueryOptions } from "../features/dashboard/dashboard.query";
+import { useMediaQuery } from "../hooks/use-media-query";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -86,6 +88,7 @@ function HomePage() {
   const deleteHomeArea = useHomeAreaDeletion();
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
   const { data: stats } = useSuspenseQuery(dashboardDataQueryOptions());
+  const isMobile = useMediaQuery("(max-width: 1023px)");
   const [showAllAreas, setShowAllAreas] = useState(false);
   const [addDialogProps, setAddDialogProps] = useState<{
     isOpen: boolean;
@@ -356,45 +359,64 @@ function HomePage() {
         {homeAreas.length > 0 ? (
           <div className="space-y-2">
             <div className="grid gap-2">
-              {visibleAreas.map((area) => (
-                <Card
-                  key={area.id}
-                  className="transition-all hover:shadow-sm hover:border-primary/50"
-                >
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() =>
-                        setAddDialogProps({
-                          isOpen: true,
-                          initialData: { ...area },
-                        })
-                      }
-                      className="flex items-center gap-3 flex-1 cursor-pointer"
-                    >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <span className="font-medium">{area.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteDialogProps({ isOpen: true, area });
-                        }}
+              {visibleAreas.map((area) => {
+                const cardContent = (
+                  <Card className="transition-all hover:shadow-sm hover:border-primary/50">
+                    <CardContent className="flex items-center justify-between p-4">
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() =>
+                          setAddDialogProps({
+                            isOpen: true,
+                            initialData: { ...area },
+                          })
+                        }
+                        className="flex items-center gap-3 flex-1 cursor-pointer"
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <span className="font-medium">{area.name}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {!isMobile && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteDialogProps({ isOpen: true, area });
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+
+                return isMobile ? (
+                  <Swipeable
+                    key={area.id}
+                    onSwipeLeft={() =>
+                      setDeleteDialogProps({ isOpen: true, area })
+                    }
+                    leftAction={
+                      <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
+                        <Trash2 className="h-5 w-5 text-destructive-foreground" />
+                      </div>
+                    }
+                  >
+                    {cardContent}
+                  </Swipeable>
+                ) : (
+                  <div key={area.id}>{cardContent}</div>
+                );
+              })}
             </div>
             {hasMoreAreas && (
               <button
