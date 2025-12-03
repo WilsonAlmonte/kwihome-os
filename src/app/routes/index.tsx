@@ -11,6 +11,7 @@ import {
   Zap,
   Home,
   BarChart3,
+  Trash2,
 } from "lucide-react";
 import {
   Card,
@@ -24,6 +25,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   useHomeAreaCreation,
   useHomeAreaUpdate,
+  useHomeAreaDeletion,
 } from "../features/home-areas/home-areas.hooks";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
 import { HomeAreaForm } from "@app/components/forms";
@@ -81,12 +83,19 @@ const MAX_VISIBLE_AREAS = 4;
 function HomePage() {
   const createHomeArea = useHomeAreaCreation();
   const updateHomeArea = useHomeAreaUpdate();
+  const deleteHomeArea = useHomeAreaDeletion();
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
   const { data: stats } = useSuspenseQuery(dashboardDataQueryOptions());
   const [showAllAreas, setShowAllAreas] = useState(false);
   const [addDialogProps, setAddDialogProps] = useState<{
     isOpen: boolean;
     initialData?: HomeArea;
+  }>({
+    isOpen: false,
+  });
+  const [deleteDialogProps, setDeleteDialogProps] = useState<{
+    isOpen: boolean;
+    area?: HomeArea;
   }>({
     isOpen: false,
   });
@@ -110,6 +119,23 @@ function HomePage() {
       setAddDialogProps({ isOpen: false, initialData: undefined });
     } catch (error) {
       toast.error("Failed to create home area", {
+        description:
+          "Please try again or contact support if the problem persists.",
+      });
+    }
+  };
+
+  const handleHomeAreaDelete = async () => {
+    if (!deleteDialogProps.area) return;
+
+    try {
+      await deleteHomeArea.mutateAsync(deleteDialogProps.area.id);
+      toast.success("Home area deleted", {
+        description: `${deleteDialogProps.area.name} has been removed.`,
+      });
+      setDeleteDialogProps({ isOpen: false, area: undefined });
+    } catch (error) {
+      toast.error("Failed to delete home area", {
         description:
           "Please try again or contact support if the problem persists.",
       });
@@ -194,8 +220,8 @@ function HomePage() {
       <ResponsiveDialog
         open={addDialogProps.isOpen}
         onOpenChange={(open) => setAddDialogProps({ isOpen: open })}
-        title="Add Home Area"
-        description="Create a new area to organize your home better."
+        title={addDialogProps.initialData ? "Edit Home Area" : "Add Home Area"}
+        description="Manage the rooms and spaces in your home."
       >
         <HomeAreaForm
           initialData={addDialogProps.initialData}
@@ -205,6 +231,33 @@ function HomePage() {
           }
           isSubmitting={createHomeArea.isPending || updateHomeArea.isPending}
         />
+      </ResponsiveDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <ResponsiveDialog
+        open={deleteDialogProps.isOpen}
+        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        title="Delete Home Area"
+        description={`Are you sure you want to delete "${deleteDialogProps.area?.name}"? This action cannot be undone.`}
+      >
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4">
+          <Button
+            variant="outline"
+            onClick={() =>
+              setDeleteDialogProps({ isOpen: false, area: undefined })
+            }
+            disabled={deleteHomeArea.isPending}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleHomeAreaDelete}
+            disabled={deleteHomeArea.isPending}
+          >
+            {deleteHomeArea.isPending ? "Deleting..." : "Delete"}
+          </Button>
+        </div>
       </ResponsiveDialog>
 
       {/* Summary Stats */}
@@ -305,25 +358,40 @@ function HomePage() {
             <div className="grid gap-2">
               {visibleAreas.map((area) => (
                 <Card
-                  role="button"
-                  tabIndex={0}
-                  onClick={() =>
-                    setAddDialogProps({
-                      isOpen: true,
-                      initialData: { ...area },
-                    })
-                  }
                   key={area.id}
-                  className="cursor-pointer transition-all hover:shadow-sm active:scale-[0.99] hover:border-primary/50"
+                  className="transition-all hover:shadow-sm hover:border-primary/50"
                 >
                   <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-3">
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        setAddDialogProps({
+                          isOpen: true,
+                          initialData: { ...area },
+                        })
+                      }
+                      className="flex items-center gap-3 flex-1 cursor-pointer"
+                    >
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <span className="font-medium">{area.name}</span>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteDialogProps({ isOpen: true, area });
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
                   </CardContent>
                 </Card>
               ))}

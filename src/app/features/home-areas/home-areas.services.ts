@@ -24,3 +24,10 @@ export const updateHomeArea = createServerFn({ method: "POST" })
     const updatedHomeArea = await repos.homeAreas.update(data.id, data.name);
     return updatedHomeArea;
   });
+
+export const deleteHomeArea = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    const { repos } = getContainer();
+    await repos.homeAreas.delete(data.id);
+  });

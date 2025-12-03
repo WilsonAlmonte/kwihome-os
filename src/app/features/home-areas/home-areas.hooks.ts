@@ -24,3 +24,14 @@ export const useHomeAreaUpdate = () => {
     },
   });
 };
+
+export const useHomeAreaDeletion = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => services.deleteHomeArea({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [HOME_AREAS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [DASHBOARD_DATA] });
+    },
+  });
+};

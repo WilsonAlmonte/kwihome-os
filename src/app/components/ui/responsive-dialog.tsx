@@ -69,7 +69,7 @@ export function ResponsiveDialog({
   return (
     <Drawer open={openState} onOpenChange={setOpenState}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent>
+      <DrawerContent style={{ paddingBottom: "16px" }}>
         <DrawerHeader className="text-left">
           <DrawerTitle>{title}</DrawerTitle>
           {description && <DrawerDescription>{description}</DrawerDescription>}
