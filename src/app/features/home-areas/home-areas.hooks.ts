@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as services from "./home-areas.services";
 import { HOME_AREAS_QUERY_KEY } from "./home-areas.query";
+import { DASHBOARD_DATA } from "../dashboard/dashboard.query";
 
 export const useHomeAreaCreation = () => {
   const queryClient = useQueryClient();
@@ -8,6 +9,7 @@ export const useHomeAreaCreation = () => {
     mutationFn: (name: string) => services.createHomeArea({ data: { name } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [HOME_AREAS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [DASHBOARD_DATA] });
     },
   });
 };
