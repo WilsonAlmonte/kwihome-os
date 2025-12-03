@@ -19,8 +19,6 @@ import {
   CardTitle,
 } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
-import { createServerFn } from "@tanstack/react-start";
-import { getContainer } from "@repo/di/container";
 import { homeAreasQueryOptions } from "../features/home-areas/home-areas.query";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -31,19 +29,13 @@ import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
 import { HomeAreaForm } from "@app/components/forms";
 import { toast } from "sonner";
 import { HomeArea } from "@repo/features/home-areas/home-area.entity";
-
-const getHomePageData = createServerFn().handler(async () => {
-  const { useCases } = getContainer();
-  const stats = await useCases.getDashboardData.execute();
-  return { stats };
-});
+import { dashboardDataQueryOptions } from "../features/dashboard/dashboard.query";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
   loader: async ({ context }) => {
-    const data = await getHomePageData();
+    await context.queryClient.prefetchQuery(dashboardDataQueryOptions());
     await context.queryClient.ensureQueryData(homeAreasQueryOptions());
-    return { ...data };
   },
 });
 
@@ -90,7 +82,7 @@ function HomePage() {
   const createHomeArea = useHomeAreaCreation();
   const updateHomeArea = useHomeAreaUpdate();
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
-  const { stats } = Route.useLoaderData();
+  const { data: stats } = useSuspenseQuery(dashboardDataQueryOptions());
   const [showAllAreas, setShowAllAreas] = useState(false);
   const [addDialogProps, setAddDialogProps] = useState<{
     isOpen: boolean;
@@ -198,6 +190,91 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Add Home Area Dialog */}
+      <ResponsiveDialog
+        open={addDialogProps.isOpen}
+        onOpenChange={(open) => setAddDialogProps({ isOpen: open })}
+        title="Add Home Area"
+        description="Create a new area to organize your home better."
+      >
+        <HomeAreaForm
+          initialData={addDialogProps.initialData}
+          onSubmit={handleHomeAreaSubmit}
+          onCancel={() =>
+            setAddDialogProps({ isOpen: false, initialData: undefined })
+          }
+          isSubmitting={createHomeArea.isPending || updateHomeArea.isPending}
+        />
+      </ResponsiveDialog>
+
+      {/* Summary Stats */}
+      <section>
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold">At a Glance</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          <Card
+            role="button"
+            onClick={
+              stats.totalHomeAreas === 0
+                ? () => setAddDialogProps({ isOpen: true })
+                : () => {}
+            }
+            className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Home Areas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats.totalHomeAreas > 0 ? (
+                <p className="text-2xl font-bold">{stats.totalHomeAreas}</p>
+              ) : (
+                <a className="text-sm text-muted-foreground">Add areas →</a>
+              )}
+            </CardContent>
+          </Card>
+
+          <Link to="/shopping">
+            <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Shopping List items
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {stats.itemsInShoppingList > 0 ? (
+                  <p className="text-2xl font-bold">
+                    {stats.itemsInShoppingList}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Start list →</p>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/notes">
+            <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Notes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {stats.totalNotes > 0 ? (
+                  <p className="text-2xl font-bold">{stats.totalNotes}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Add note →</p>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </section>
+
       {/* Home Areas Section */}
       <section>
         <div className="flex items-center justify-between mb-4">
@@ -284,91 +361,6 @@ function HomePage() {
             </CardContent>
           </Card>
         )}
-      </section>
-
-      {/* Add Home Area Dialog */}
-      <ResponsiveDialog
-        open={addDialogProps.isOpen}
-        onOpenChange={(open) => setAddDialogProps({ isOpen: open })}
-        title="Add Home Area"
-        description="Create a new area to organize your home better."
-      >
-        <HomeAreaForm
-          initialData={addDialogProps.initialData}
-          onSubmit={handleHomeAreaSubmit}
-          onCancel={() =>
-            setAddDialogProps({ isOpen: false, initialData: undefined })
-          }
-          isSubmitting={createHomeArea.isPending || updateHomeArea.isPending}
-        />
-      </ResponsiveDialog>
-
-      {/* Summary Stats */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">At a Glance</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          <Card
-            role="button"
-            onClick={
-              stats.totalHomeAreas === 0
-                ? () => setAddDialogProps({ isOpen: true })
-                : () => {}
-            }
-            className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Home Areas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {stats.totalHomeAreas > 0 ? (
-                <p className="text-2xl font-bold">{stats.totalHomeAreas}</p>
-              ) : (
-                <a className="text-sm text-muted-foreground">Add areas →</a>
-              )}
-            </CardContent>
-          </Card>
-
-          <Link to="/shopping">
-            <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Shopping List
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {stats.itemsInShoppingList > 0 ? (
-                  <p className="text-2xl font-bold">
-                    {stats.itemsInShoppingList}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Start list →</p>
-                )}
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/notes">
-            <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {stats.totalNotes > 0 ? (
-                  <p className="text-2xl font-bold">{stats.totalNotes}</p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Add note →</p>
-                )}
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
       </section>
     </div>
   );
