@@ -6,11 +6,10 @@ export const prismaHomeAreasRepository: HomeAreasRepository = {
   findAll: async function (): Promise<HomeArea[]> {
     return prisma.homeArea.findMany({
       orderBy: { createdAt: "asc" },
-      where: { deletedAt: null },
     });
   },
   findById: function (id: string): Promise<HomeArea | null> {
-    return prisma.homeArea.findFirst({ where: { id, deletedAt: null } });
+    return prisma.homeArea.findFirst({ where: { id } });
   },
   create: function (name: string): Promise<HomeArea> {
     return prisma.homeArea.create({ data: { name } });
@@ -22,15 +21,12 @@ export const prismaHomeAreasRepository: HomeAreasRepository = {
     });
   },
 
-  // Soft delete implementation
   delete: function (id: string): Promise<void> {
-    return prisma.homeArea
-      .update({ where: { id }, data: { deletedAt: new Date() } })
-      .then(() => {});
+    return prisma.homeArea.delete({ where: { id } }).then(() => {});
   },
 
   getStats: async function (): Promise<{ total: number }> {
-    const total = await prisma.homeArea.count({ where: { deletedAt: null } });
+    const total = await prisma.homeArea.count();
     return { total };
   },
 };

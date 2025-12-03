@@ -141,8 +141,7 @@ export const HomeAreaScalarFieldEnum = {
   id: 'id',
   name: 'name',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type HomeAreaScalarFieldEnum = (typeof HomeAreaScalarFieldEnum)[keyof typeof HomeAreaScalarFieldEnum]

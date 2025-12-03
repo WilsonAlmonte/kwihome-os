@@ -83,7 +83,6 @@ model HomeArea {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   // Relations
   inventoryItems   InventoryItem[]
