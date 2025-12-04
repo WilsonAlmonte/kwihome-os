@@ -7,7 +7,7 @@ import { mockHomeAreasRepository } from "@repo/test/mocks/home-areas.repository.
 // REPOSITORY MOCK CONFIGURATION
 // Toggle: true = mock, false = real (Prisma)
 // ============================================
-const USE_MOCK = {
+const USE_MOCK: Record<keyof typeof repoRegistry, boolean> = {
   homeAreas: false,
   // inventory: true,
   // tasks: false,
