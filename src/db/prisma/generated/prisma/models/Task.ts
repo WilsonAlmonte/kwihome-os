@@ -32,7 +32,7 @@ export type TaskMinAggregateOutputType = {
   areaId: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  deletedAt: Date | null
+  completedAt: Date | null
 }
 
 export type TaskMaxAggregateOutputType = {
@@ -43,7 +43,7 @@ export type TaskMaxAggregateOutputType = {
   areaId: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  deletedAt: Date | null
+  completedAt: Date | null
 }
 
 export type TaskCountAggregateOutputType = {
@@ -54,7 +54,7 @@ export type TaskCountAggregateOutputType = {
   areaId: number
   createdAt: number
   updatedAt: number
-  deletedAt: number
+  completedAt: number
   _all: number
 }
 
@@ -67,7 +67,7 @@ export type TaskMinAggregateInputType = {
   areaId?: true
   createdAt?: true
   updatedAt?: true
-  deletedAt?: true
+  completedAt?: true
 }
 
 export type TaskMaxAggregateInputType = {
@@ -78,7 +78,7 @@ export type TaskMaxAggregateInputType = {
   areaId?: true
   createdAt?: true
   updatedAt?: true
-  deletedAt?: true
+  completedAt?: true
 }
 
 export type TaskCountAggregateInputType = {
@@ -89,7 +89,7 @@ export type TaskCountAggregateInputType = {
   areaId?: true
   createdAt?: true
   updatedAt?: true
-  deletedAt?: true
+  completedAt?: true
   _all?: true
 }
 
@@ -173,7 +173,7 @@ export type TaskGroupByOutputType = {
   areaId: string | null
   createdAt: Date
   updatedAt: Date
-  deletedAt: Date | null
+  completedAt: Date | null
   _count: TaskCountAggregateOutputType | null
   _min: TaskMinAggregateOutputType | null
   _max: TaskMaxAggregateOutputType | null
@@ -205,7 +205,7 @@ export type TaskWhereInput = {
   areaId?: Prisma.StringNullableFilter<"Task"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Task"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
   area?: Prisma.XOR<Prisma.HomeAreaNullableScalarRelationFilter, Prisma.HomeAreaWhereInput> | null
 }
 
@@ -217,7 +217,7 @@ export type TaskOrderByWithRelationInput = {
   areaId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   area?: Prisma.HomeAreaOrderByWithRelationInput
 }
 
@@ -232,7 +232,7 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
   areaId?: Prisma.StringNullableFilter<"Task"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Task"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
   area?: Prisma.XOR<Prisma.HomeAreaNullableScalarRelationFilter, Prisma.HomeAreaWhereInput> | null
 }, "id">
 
@@ -244,7 +244,7 @@ export type TaskOrderByWithAggregationInput = {
   areaId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TaskCountOrderByAggregateInput
   _max?: Prisma.TaskMaxOrderByAggregateInput
   _min?: Prisma.TaskMinOrderByAggregateInput
@@ -261,7 +261,7 @@ export type TaskScalarWhereWithAggregatesInput = {
   areaId?: Prisma.StringNullableWithAggregatesFilter<"Task"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Task"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Task"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Task"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Task"> | Date | string | null
 }
 
 export type TaskCreateInput = {
@@ -271,7 +271,7 @@ export type TaskCreateInput = {
   completed?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
+  completedAt?: Date | string | null
   area?: Prisma.HomeAreaCreateNestedOneWithoutTasksInput
 }
 
@@ -283,7 +283,7 @@ export type TaskUncheckedCreateInput = {
   areaId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
+  completedAt?: Date | string | null
 }
 
 export type TaskUpdateInput = {
@@ -293,7 +293,7 @@ export type TaskUpdateInput = {
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   area?: Prisma.HomeAreaUpdateOneWithoutTasksNestedInput
 }
 
@@ -305,7 +305,7 @@ export type TaskUncheckedUpdateInput = {
   areaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type TaskCreateManyInput = {
@@ -316,7 +316,7 @@ export type TaskCreateManyInput = {
   areaId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
+  completedAt?: Date | string | null
 }
 
 export type TaskUpdateManyMutationInput = {
@@ -326,7 +326,7 @@ export type TaskUpdateManyMutationInput = {
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type TaskUncheckedUpdateManyInput = {
@@ -337,7 +337,7 @@ export type TaskUncheckedUpdateManyInput = {
   areaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type TaskListRelationFilter = {
@@ -358,7 +358,7 @@ export type TaskCountOrderByAggregateInput = {
   areaId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
 }
 
 export type TaskMaxOrderByAggregateInput = {
@@ -369,7 +369,7 @@ export type TaskMaxOrderByAggregateInput = {
   areaId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
 }
 
 export type TaskMinOrderByAggregateInput = {
@@ -380,7 +380,7 @@ export type TaskMinOrderByAggregateInput = {
   areaId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
 }
 
 export type TaskCreateNestedManyWithoutAreaInput = {
@@ -432,7 +432,7 @@ export type TaskCreateWithoutAreaInput = {
   completed?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
+  completedAt?: Date | string | null
 }
 
 export type TaskUncheckedCreateWithoutAreaInput = {
@@ -442,7 +442,7 @@ export type TaskUncheckedCreateWithoutAreaInput = {
   completed?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
+  completedAt?: Date | string | null
 }
 
 export type TaskCreateOrConnectWithoutAreaInput = {
@@ -482,7 +482,7 @@ export type TaskScalarWhereInput = {
   areaId?: Prisma.StringNullableFilter<"Task"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Task"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
 }
 
 export type TaskCreateManyAreaInput = {
@@ -492,7 +492,7 @@ export type TaskCreateManyAreaInput = {
   completed?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
+  completedAt?: Date | string | null
 }
 
 export type TaskUpdateWithoutAreaInput = {
@@ -502,7 +502,7 @@ export type TaskUpdateWithoutAreaInput = {
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type TaskUncheckedUpdateWithoutAreaInput = {
@@ -512,7 +512,7 @@ export type TaskUncheckedUpdateWithoutAreaInput = {
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type TaskUncheckedUpdateManyWithoutAreaInput = {
@@ -522,7 +522,7 @@ export type TaskUncheckedUpdateManyWithoutAreaInput = {
   completed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -535,7 +535,7 @@ export type TaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   areaId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
+  completedAt?: boolean
   area?: boolean | Prisma.Task$areaArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
@@ -547,7 +547,7 @@ export type TaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   areaId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
+  completedAt?: boolean
   area?: boolean | Prisma.Task$areaArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
@@ -559,7 +559,7 @@ export type TaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   areaId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
+  completedAt?: boolean
   area?: boolean | Prisma.Task$areaArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
@@ -571,10 +571,10 @@ export type TaskSelectScalar = {
   areaId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
+  completedAt?: boolean
 }
 
-export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "completed" | "areaId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["task"]>
+export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "completed" | "areaId" | "createdAt" | "updatedAt" | "completedAt", ExtArgs["result"]["task"]>
 export type TaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   area?: boolean | Prisma.Task$areaArgs<ExtArgs>
 }
@@ -598,7 +598,7 @@ export type $TaskPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     areaId: string | null
     createdAt: Date
     updatedAt: Date
-    deletedAt: Date | null
+    completedAt: Date | null
   }, ExtArgs["result"]["task"]>
   composites: {}
 }
@@ -1030,7 +1030,7 @@ export interface TaskFieldRefs {
   readonly areaId: Prisma.FieldRef<"Task", 'String'>
   readonly createdAt: Prisma.FieldRef<"Task", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Task", 'DateTime'>
-  readonly deletedAt: Prisma.FieldRef<"Task", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"Task", 'DateTime'>
 }
     
 
