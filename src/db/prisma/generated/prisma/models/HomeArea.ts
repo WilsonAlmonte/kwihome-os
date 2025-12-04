@@ -29,7 +29,6 @@ export type HomeAreaMinAggregateOutputType = {
   name: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  deletedAt: Date | null
 }
 
 export type HomeAreaMaxAggregateOutputType = {
@@ -37,7 +36,6 @@ export type HomeAreaMaxAggregateOutputType = {
   name: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  deletedAt: Date | null
 }
 
 export type HomeAreaCountAggregateOutputType = {
@@ -45,7 +43,6 @@ export type HomeAreaCountAggregateOutputType = {
   name: number
   createdAt: number
   updatedAt: number
-  deletedAt: number
   _all: number
 }
 
@@ -55,7 +52,6 @@ export type HomeAreaMinAggregateInputType = {
   name?: true
   createdAt?: true
   updatedAt?: true
-  deletedAt?: true
 }
 
 export type HomeAreaMaxAggregateInputType = {
@@ -63,7 +59,6 @@ export type HomeAreaMaxAggregateInputType = {
   name?: true
   createdAt?: true
   updatedAt?: true
-  deletedAt?: true
 }
 
 export type HomeAreaCountAggregateInputType = {
@@ -71,7 +66,6 @@ export type HomeAreaCountAggregateInputType = {
   name?: true
   createdAt?: true
   updatedAt?: true
-  deletedAt?: true
   _all?: true
 }
 
@@ -152,7 +146,6 @@ export type HomeAreaGroupByOutputType = {
   name: string
   createdAt: Date
   updatedAt: Date
-  deletedAt: Date | null
   _count: HomeAreaCountAggregateOutputType | null
   _min: HomeAreaMinAggregateOutputType | null
   _max: HomeAreaMaxAggregateOutputType | null
@@ -181,7 +174,6 @@ export type HomeAreaWhereInput = {
   name?: Prisma.StringFilter<"HomeArea"> | string
   createdAt?: Prisma.DateTimeFilter<"HomeArea"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"HomeArea"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableFilter<"HomeArea"> | Date | string | null
   inventoryItems?: Prisma.InventoryItemListRelationFilter
   shoppingListItems?: Prisma.ShoppingListItemListRelationFilter
   tasks?: Prisma.TaskListRelationFilter
@@ -193,7 +185,6 @@ export type HomeAreaOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   inventoryItems?: Prisma.InventoryItemOrderByRelationAggregateInput
   shoppingListItems?: Prisma.ShoppingListItemOrderByRelationAggregateInput
   tasks?: Prisma.TaskOrderByRelationAggregateInput
@@ -208,7 +199,6 @@ export type HomeAreaWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"HomeArea"> | string
   createdAt?: Prisma.DateTimeFilter<"HomeArea"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"HomeArea"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableFilter<"HomeArea"> | Date | string | null
   inventoryItems?: Prisma.InventoryItemListRelationFilter
   shoppingListItems?: Prisma.ShoppingListItemListRelationFilter
   tasks?: Prisma.TaskListRelationFilter
@@ -220,7 +210,6 @@ export type HomeAreaOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.HomeAreaCountOrderByAggregateInput
   _max?: Prisma.HomeAreaMaxOrderByAggregateInput
   _min?: Prisma.HomeAreaMinOrderByAggregateInput
@@ -234,7 +223,6 @@ export type HomeAreaScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"HomeArea"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"HomeArea"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"HomeArea"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"HomeArea"> | Date | string | null
 }
 
 export type HomeAreaCreateInput = {
@@ -242,7 +230,6 @@ export type HomeAreaCreateInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutAreaInput
   shoppingListItems?: Prisma.ShoppingListItemCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskCreateNestedManyWithoutAreaInput
@@ -254,7 +241,6 @@ export type HomeAreaUncheckedCreateInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutAreaInput
   shoppingListItems?: Prisma.ShoppingListItemUncheckedCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAreaInput
@@ -266,7 +252,6 @@ export type HomeAreaUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutAreaNestedInput
   shoppingListItems?: Prisma.ShoppingListItemUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutAreaNestedInput
@@ -278,7 +263,6 @@ export type HomeAreaUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutAreaNestedInput
   shoppingListItems?: Prisma.ShoppingListItemUncheckedUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutAreaNestedInput
@@ -290,7 +274,6 @@ export type HomeAreaCreateManyInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
 }
 
 export type HomeAreaUpdateManyMutationInput = {
@@ -298,7 +281,6 @@ export type HomeAreaUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type HomeAreaUncheckedUpdateManyInput = {
@@ -306,7 +288,6 @@ export type HomeAreaUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type HomeAreaCountOrderByAggregateInput = {
@@ -314,7 +295,6 @@ export type HomeAreaCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
 }
 
 export type HomeAreaMaxOrderByAggregateInput = {
@@ -322,7 +302,6 @@ export type HomeAreaMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
 }
 
 export type HomeAreaMinOrderByAggregateInput = {
@@ -330,7 +309,6 @@ export type HomeAreaMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
 }
 
 export type HomeAreaNullableScalarRelationFilter = {
@@ -407,7 +385,6 @@ export type HomeAreaCreateWithoutInventoryItemsInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   shoppingListItems?: Prisma.ShoppingListItemCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskCreateNestedManyWithoutAreaInput
   notes?: Prisma.NoteCreateNestedManyWithoutAreaInput
@@ -418,7 +395,6 @@ export type HomeAreaUncheckedCreateWithoutInventoryItemsInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   shoppingListItems?: Prisma.ShoppingListItemUncheckedCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAreaInput
   notes?: Prisma.NoteUncheckedCreateNestedManyWithoutAreaInput
@@ -445,7 +421,6 @@ export type HomeAreaUpdateWithoutInventoryItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   shoppingListItems?: Prisma.ShoppingListItemUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutAreaNestedInput
   notes?: Prisma.NoteUpdateManyWithoutAreaNestedInput
@@ -456,7 +431,6 @@ export type HomeAreaUncheckedUpdateWithoutInventoryItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   shoppingListItems?: Prisma.ShoppingListItemUncheckedUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutAreaNestedInput
   notes?: Prisma.NoteUncheckedUpdateManyWithoutAreaNestedInput
@@ -467,7 +441,6 @@ export type HomeAreaCreateWithoutShoppingListItemsInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskCreateNestedManyWithoutAreaInput
   notes?: Prisma.NoteCreateNestedManyWithoutAreaInput
@@ -478,7 +451,6 @@ export type HomeAreaUncheckedCreateWithoutShoppingListItemsInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAreaInput
   notes?: Prisma.NoteUncheckedCreateNestedManyWithoutAreaInput
@@ -505,7 +477,6 @@ export type HomeAreaUpdateWithoutShoppingListItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutAreaNestedInput
   notes?: Prisma.NoteUpdateManyWithoutAreaNestedInput
@@ -516,7 +487,6 @@ export type HomeAreaUncheckedUpdateWithoutShoppingListItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutAreaNestedInput
   notes?: Prisma.NoteUncheckedUpdateManyWithoutAreaNestedInput
@@ -527,7 +497,6 @@ export type HomeAreaCreateWithoutTasksInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutAreaInput
   shoppingListItems?: Prisma.ShoppingListItemCreateNestedManyWithoutAreaInput
   notes?: Prisma.NoteCreateNestedManyWithoutAreaInput
@@ -538,7 +507,6 @@ export type HomeAreaUncheckedCreateWithoutTasksInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutAreaInput
   shoppingListItems?: Prisma.ShoppingListItemUncheckedCreateNestedManyWithoutAreaInput
   notes?: Prisma.NoteUncheckedCreateNestedManyWithoutAreaInput
@@ -565,7 +533,6 @@ export type HomeAreaUpdateWithoutTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutAreaNestedInput
   shoppingListItems?: Prisma.ShoppingListItemUpdateManyWithoutAreaNestedInput
   notes?: Prisma.NoteUpdateManyWithoutAreaNestedInput
@@ -576,7 +543,6 @@ export type HomeAreaUncheckedUpdateWithoutTasksInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutAreaNestedInput
   shoppingListItems?: Prisma.ShoppingListItemUncheckedUpdateManyWithoutAreaNestedInput
   notes?: Prisma.NoteUncheckedUpdateManyWithoutAreaNestedInput
@@ -587,7 +553,6 @@ export type HomeAreaCreateWithoutNotesInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemCreateNestedManyWithoutAreaInput
   shoppingListItems?: Prisma.ShoppingListItemCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskCreateNestedManyWithoutAreaInput
@@ -598,7 +563,6 @@ export type HomeAreaUncheckedCreateWithoutNotesInput = {
   name: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  deletedAt?: Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedCreateNestedManyWithoutAreaInput
   shoppingListItems?: Prisma.ShoppingListItemUncheckedCreateNestedManyWithoutAreaInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAreaInput
@@ -625,7 +589,6 @@ export type HomeAreaUpdateWithoutNotesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUpdateManyWithoutAreaNestedInput
   shoppingListItems?: Prisma.ShoppingListItemUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutAreaNestedInput
@@ -636,7 +599,6 @@ export type HomeAreaUncheckedUpdateWithoutNotesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   inventoryItems?: Prisma.InventoryItemUncheckedUpdateManyWithoutAreaNestedInput
   shoppingListItems?: Prisma.ShoppingListItemUncheckedUpdateManyWithoutAreaNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutAreaNestedInput
@@ -705,7 +667,6 @@ export type HomeAreaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
   inventoryItems?: boolean | Prisma.HomeArea$inventoryItemsArgs<ExtArgs>
   shoppingListItems?: boolean | Prisma.HomeArea$shoppingListItemsArgs<ExtArgs>
   tasks?: boolean | Prisma.HomeArea$tasksArgs<ExtArgs>
@@ -718,7 +679,6 @@ export type HomeAreaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   name?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
 }, ExtArgs["result"]["homeArea"]>
 
 export type HomeAreaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -726,7 +686,6 @@ export type HomeAreaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   name?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
 }, ExtArgs["result"]["homeArea"]>
 
 export type HomeAreaSelectScalar = {
@@ -734,10 +693,9 @@ export type HomeAreaSelectScalar = {
   name?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  deletedAt?: boolean
 }
 
-export type HomeAreaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["homeArea"]>
+export type HomeAreaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "createdAt" | "updatedAt", ExtArgs["result"]["homeArea"]>
 export type HomeAreaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inventoryItems?: boolean | Prisma.HomeArea$inventoryItemsArgs<ExtArgs>
   shoppingListItems?: boolean | Prisma.HomeArea$shoppingListItemsArgs<ExtArgs>
@@ -761,7 +719,6 @@ export type $HomeAreaPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     name: string
     createdAt: Date
     updatedAt: Date
-    deletedAt: Date | null
   }, ExtArgs["result"]["homeArea"]>
   composites: {}
 }
@@ -1193,7 +1150,6 @@ export interface HomeAreaFieldRefs {
   readonly name: Prisma.FieldRef<"HomeArea", 'String'>
   readonly createdAt: Prisma.FieldRef<"HomeArea", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"HomeArea", 'DateTime'>
-  readonly deletedAt: Prisma.FieldRef<"HomeArea", 'DateTime'>
 }
     
 

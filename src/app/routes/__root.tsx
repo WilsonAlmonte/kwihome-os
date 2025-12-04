@@ -1,11 +1,19 @@
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import appCss from "../styles.css?url";
 import { AppLayout } from "@app/components/layout";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@app/components/ui/sonner";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   component: AppLayout,
   head: () => ({
     meta: [
@@ -21,6 +29,19 @@ export const Route = createRootRoute({
       },
     ],
     links: [
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -38,10 +59,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <QueryClientProvider client={Route.useRouteContext().queryClient}>
+          {children}
+        </QueryClientProvider>
+        <Toaster />
         <TanStackDevtools
           config={{
             position: "bottom-right",
+            openHotkey: "" as any,
           }}
           plugins={[
             {
