@@ -1,7 +1,14 @@
 import GetDashboardDataUseCase from "@repo/features/dashboard/get-dashboard-data.use-case";
 import { HomeAreasRepository } from "@repo/features/home-areas/home-areas.port";
+import {
+  MarkTaskCompleteUseCase,
+  MarkTaskPendingUseCase,
+} from "@repo/features/tasks/task.use-cases";
+import { TasksRepository } from "@repo/features/tasks/tasks.port";
 import { prismaHomeAreasRepository } from "@repo/infrastructure/prisma/home-areas.repository.prisma";
+import { prismaTasksRepository } from "@repo/infrastructure/prisma/tasks.repository.prisma";
 import { mockHomeAreasRepository } from "@repo/test/mocks/home-areas.repository.mock";
+import { mockTasksRepository } from "@repo/test/mocks/tasks.repository.mock";
 
 // ============================================
 // REPOSITORY MOCK CONFIGURATION
@@ -9,6 +16,7 @@ import { mockHomeAreasRepository } from "@repo/test/mocks/home-areas.repository.
 // ============================================
 const USE_MOCK: Record<keyof typeof repoRegistry, boolean> = {
   homeAreas: false,
+  tasks: false,
   // inventory: true,
   // tasks: false,
   // shoppingList: true,
@@ -24,6 +32,10 @@ const repoRegistry = {
     mock: mockHomeAreasRepository,
     real: prismaHomeAreasRepository,
   } satisfies RepoEntry<HomeAreasRepository>,
+  tasks: {
+    mock: mockTasksRepository,
+    real: prismaTasksRepository, // Replace with real implementation when available
+  } satisfies RepoEntry<TasksRepository>,
 } as const;
 
 type RepoKey = keyof typeof repoRegistry;
@@ -38,10 +50,13 @@ function resolve<K extends RepoKey>(key: K): RepoType<K> {
 // ============================================
 export interface Repositories {
   homeAreas: HomeAreasRepository;
+  tasks: TasksRepository;
 }
 
 export interface UseCases {
   getDashboardData: GetDashboardDataUseCase;
+  markTaskComplete: MarkTaskCompleteUseCase;
+  markTaskPending: MarkTaskPendingUseCase;
 }
 
 export interface AppContainer {
@@ -57,10 +72,13 @@ let cachedContainer: AppContainer | null = null;
 function createContainer(): AppContainer {
   const repos: Repositories = {
     homeAreas: resolve("homeAreas"),
+    tasks: resolve("tasks"),
   };
 
   const useCases: UseCases = {
     getDashboardData: new GetDashboardDataUseCase(repos),
+    markTaskComplete: new MarkTaskCompleteUseCase(repos.tasks),
+    markTaskPending: new MarkTaskPendingUseCase(repos.tasks),
   };
 
   return {
