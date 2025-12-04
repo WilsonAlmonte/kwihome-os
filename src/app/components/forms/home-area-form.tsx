@@ -8,14 +8,7 @@ import {
   Button,
 } from "@app/components/forms";
 import type { HomeArea } from "@repo/features/home-areas/home-area.entity";
-
-const homeAreaSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Area name is required")
-    .max(50, "Area name must be 50 characters or less")
-    .trim(),
-});
+import { homeAreaSchema } from "@repo/features/home-areas/home-area.entity";
 
 type HomeAreaFormData = z.infer<typeof homeAreaSchema>;
 

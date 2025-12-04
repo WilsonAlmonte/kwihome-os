@@ -26,7 +26,7 @@ import {
   useMarkTaskPending,
 } from "../features/tasks/tasks.hooks";
 import { useMediaQuery } from "../hooks/use-media-query";
-import { Task } from "@repo/features/tasks/task.entity";
+import { Task, taskSchema } from "@repo/features/tasks/task.entity";
 import { HomeArea } from "@repo/features/home-areas/home-area.entity";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -38,19 +38,6 @@ export const Route = createFileRoute("/tasks")({
     await context.queryClient.ensureQueryData(tasksQueryOptions());
     await context.queryClient.ensureQueryData(homeAreasQueryOptions());
   },
-});
-
-const taskSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Task title is required")
-    .max(100, "Task title must be 100 characters or less")
-    .trim(),
-  description: z
-    .string()
-    .max(500, "Description must be 500 characters or less")
-    .optional(),
-  homeAreaId: z.string().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
