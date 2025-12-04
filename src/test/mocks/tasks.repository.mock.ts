@@ -23,7 +23,6 @@ export const mockTasksRepository: TasksRepository = {
       description: description || "",
       homeArea: homeArea || undefined,
       completed: false,
-      updatedAt: new Date(),
     };
     tasks.push(newTask);
     return Promise.resolve(newTask);
@@ -41,7 +40,6 @@ export const mockTasksRepository: TasksRepository = {
       tasks[taskIndex] = {
         ...tasks[taskIndex],
         ...updates,
-        updatedAt: new Date(),
       };
     }
     return Promise.resolve(tasks[taskIndex]);
