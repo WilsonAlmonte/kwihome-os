@@ -25,6 +25,10 @@
     "@tanstack/react-store": "^0.8.0",
     "@tanstack/router-plugin": "^1.132.0",
     "@tanstack/zod-form-adapter": "^0.42.1",
+    "@tiptap/extension-link": "^3.13.0",
+    "@tiptap/extension-placeholder": "^3.13.0",
+    "@tiptap/react": "^3.13.0",
+    "@tiptap/starter-kit": "^3.13.0",
     "better-auth": "^1.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -43,6 +47,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "@tanstack/devtools-vite": "^0.3.11",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
