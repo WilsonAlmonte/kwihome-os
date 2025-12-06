@@ -43,7 +43,7 @@ const USE_MOCK: Record<keyof typeof repoRegistry, boolean> = {
   tasks: false,
   notes: false,
   inventory: false,
-  shoppingLists: true,
+  shoppingLists: false,
 } as const;
 
 // ============================================
@@ -130,7 +130,13 @@ function createContainer(): AppContainer {
   };
 
   const useCases: UseCases = {
-    getDashboardData: new GetDashboardDataUseCase(repos),
+    getDashboardData: new GetDashboardDataUseCase(
+      repos.homeAreas,
+      repos.tasks,
+      repos.notes,
+      repos.inventory,
+      repos.shoppingLists
+    ),
     markTaskComplete: new MarkTaskCompleteUseCase(repos.tasks),
     markTaskPending: new MarkTaskPendingUseCase(repos.tasks),
     toggleInventoryStatus: new ToggleInventoryStatusUseCase(

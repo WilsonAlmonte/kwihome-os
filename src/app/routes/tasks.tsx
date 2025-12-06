@@ -10,7 +10,6 @@ import {
   ChevronDown,
   MapPin,
   Edit,
-  CheckCheckIcon,
 } from "lucide-react";
 import { Card, CardContent } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
@@ -32,7 +31,13 @@ import { Task, taskSchema } from "@repo/features/tasks/task.entity";
 import { HomeArea } from "@repo/features/home-areas/home-area.entity";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { Field, FieldError, Input } from "@app/components/forms";
+import {
+  Field,
+  FieldError,
+  Input,
+  HomeAreaSelector,
+  FormActions,
+} from "@app/components/forms";
 
 export const Route = createFileRoute("/tasks")({
   component: TasksPage,
@@ -123,79 +128,28 @@ function TaskForm({
 
       <form.Field name="homeAreaId">
         {(field) => (
-          <Field>
-            <div className="grid grid-cols-2 gap-2">
-              {!initialData?.homeArea && (
-                <button
-                  type="button"
-                  onClick={() => field.handleChange("")}
-                  disabled={isSubmitting}
-                  className={`flex items-center justify-center px-3 py-2.5 text-sm rounded-lg border-2 transition-all ${
-                    field.state.value === ""
-                      ? "border-primary bg-primary/10 text-primary font-medium"
-                      : "border-input hover:border-primary/50 hover:bg-accent"
-                  } ${
-                    isSubmitting
-                      ? "opacity-50 cursor-not-allowed"
-                      : "cursor-pointer"
-                  }`}
-                >
-                  No Room
-                </button>
-              )}
-              {homeAreas.map((area) => (
-                <button
-                  key={area.id}
-                  type="button"
-                  onClick={() => field.handleChange(area.id)}
-                  disabled={isSubmitting}
-                  className={`flex items-center justify-center px-3 py-2.5 text-sm rounded-lg border-2 transition-all ${
-                    field.state.value === area.id
-                      ? "border-primary bg-primary/10 text-primary font-medium"
-                      : "border-input hover:border-primary/50 hover:bg-accent"
-                  } ${
-                    isSubmitting
-                      ? "opacity-50 cursor-not-allowed"
-                      : "cursor-pointer"
-                  }`}
-                >
-                  {field.state.value === area.id ? (
-                    <CheckCheckIcon className="h-3.5 w-3.5 mr-1.5" />
-                  ) : (
-                    <MapPin className="h-3.5 w-3.5 mr-1.5" />
-                  )}
-                  {area.name}
-                </button>
-              ))}
-            </div>
-          </Field>
+          <HomeAreaSelector
+            value={field.state.value || undefined}
+            onChange={(value) => field.handleChange(value ?? "")}
+            homeAreas={homeAreas}
+            disabled={isSubmitting}
+            showNoRoomOption={!initialData?.homeArea}
+          />
         )}
       </form.Field>
 
-      <div className="flex gap-2 justify-end pt-2">
-        {onCancel && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
+      <form.Subscribe
+        selector={(state) => [state.canSubmit, state.isSubmitting]}
+      >
+        {([canSubmit, isSubmittingForm]) => (
+          <FormActions
+            onCancel={onCancel}
+            canSubmit={canSubmit as boolean}
+            isSubmitting={isSubmitting || (isSubmittingForm as boolean)}
+            submitLabel={initialData ? "Update Task" : "Create Task"}
+          />
         )}
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
-          {([canSubmit, isSubmittingForm]) => (
-            <Button
-              type="submit"
-              disabled={!canSubmit || isSubmitting || isSubmittingForm}
-            >
-              {initialData ? "Update Task" : "Create Task"}
-            </Button>
-          )}
-        </form.Subscribe>
-      </div>
+      </form.Subscribe>
     </form>
   );
 }

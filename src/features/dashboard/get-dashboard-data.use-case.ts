@@ -1,4 +1,3 @@
-import { Repositories } from "@repo/di/container";
 import { HomeAreasRepository } from "../home-areas/home-areas.port";
 import { DashboardData } from "./dashboard-data.entity";
 import { TasksRepository } from "../tasks/tasks.port";
@@ -8,18 +7,13 @@ import { InventoryStatus } from "../inventory/inventory-item.entity";
 import { ShoppingListsRepository } from "../shopping-lists";
 
 export default class GetDashboardDataUseCase {
-  _homeAreasRepo: HomeAreasRepository;
-  _tasksRepo: TasksRepository;
-  _notesRepo: NotesRepository;
-  _inventoryRepo: InventoryRepository;
-  _shoppingListsRepo: ShoppingListsRepository;
-  constructor(repos: Repositories) {
-    this._homeAreasRepo = repos.homeAreas;
-    this._tasksRepo = repos.tasks;
-    this._notesRepo = repos.notes;
-    this._inventoryRepo = repos.inventory;
-    this._shoppingListsRepo = repos.shoppingLists;
-  }
+  constructor(
+    private _homeAreasRepo: HomeAreasRepository,
+    private _tasksRepo: TasksRepository,
+    private _notesRepo: NotesRepository,
+    private _inventoryRepo: InventoryRepository,
+    private _shoppingListsRepo: ShoppingListsRepository
+  ) {}
 
   async execute(): Promise<DashboardData> {
     const [
