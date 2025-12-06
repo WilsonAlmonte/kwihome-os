@@ -28,7 +28,7 @@ const USE_MOCK: Record<keyof typeof repoRegistry, boolean> = {
   homeAreas: false,
   tasks: false,
   notes: false,
-  inventory: true,
+  inventory: false,
   // shoppingList: true,
 } as const;
 
