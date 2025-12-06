@@ -30,6 +30,7 @@ interface ResponsiveDialogProps {
   showFooter?: boolean;
   cancelText?: string;
   onCancel?: () => void;
+  maxWidth?: string;
 }
 
 export function ResponsiveDialog({
@@ -42,6 +43,7 @@ export function ResponsiveDialog({
   showFooter = false,
   cancelText = "Cancel",
   onCancel,
+  maxWidth = "sm:max-w-[425px]",
 }: ResponsiveDialogProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -53,7 +55,7 @@ export function ResponsiveDialog({
     return (
       <Dialog open={openState} onOpenChange={setOpenState}>
         {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className={maxWidth}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             {description && (

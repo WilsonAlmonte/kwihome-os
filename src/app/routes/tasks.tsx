@@ -14,6 +14,7 @@ import {
 import { Card, CardContent } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
+import { ConfirmationDialog } from "@app/components/ui/confirmation-dialog";
 import { Swipeable } from "@app/components/ui/swipeable";
 import { toast } from "sonner";
 import { tasksQueryOptions } from "../features/tasks/task.query";
@@ -432,31 +433,19 @@ function TasksPage() {
       </ResponsiveDialog>
 
       {/* Delete Confirmation Dialog */}
-      <ResponsiveDialog
+      <ConfirmationDialog
         open={deleteDialogProps.isOpen}
         onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
         title="Delete Task"
         description={`Are you sure you want to delete "${deleteDialogProps.task?.title}"? This action cannot be undone.`}
-      >
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4">
-          <Button
-            variant="outline"
-            onClick={() =>
-              setDeleteDialogProps({ isOpen: false, task: undefined })
-            }
-            disabled={deleteTask.isPending}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleTaskDelete}
-            disabled={deleteTask.isPending}
-          >
-            {deleteTask.isPending ? "Deleting..." : "Delete"}
-          </Button>
-        </div>
-      </ResponsiveDialog>
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={handleTaskDelete}
+        onCancel={() =>
+          setDeleteDialogProps({ isOpen: false, task: undefined })
+        }
+        isLoading={deleteTask.isPending}
+      />
 
       {tasks.length > 0 ? (
         <div className="space-y-6">
