@@ -22,8 +22,10 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: "viewport",
-        content: "width=device-width, initial-scale=1",
+        content:
+          "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
       },
+      // <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content"></meta>
       {
         title: "Kwihome Os",
       },
@@ -62,10 +64,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={Route.useRouteContext().queryClient}>
           {children}
         </QueryClientProvider>
-        <Toaster />
-        <TanStackDevtools
+        <Toaster position="top-center" />
+        {/* <TanStackDevtools
           config={{
             position: "bottom-right",
+            triggerHidden: true,
             openHotkey: "" as any,
           }}
           plugins={[
@@ -74,7 +77,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               render: <TanStackRouterDevtoolsPanel />,
             },
           ]}
-        />
+        /> */}
         <Scripts />
       </body>
     </html>

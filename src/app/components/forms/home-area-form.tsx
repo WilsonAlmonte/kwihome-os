@@ -51,7 +51,7 @@ export function HomeAreaForm({
       >
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Area Name</FieldLabel>
+            <FieldLabel htmlFor={field.name}>Room Name</FieldLabel>
             <Input
               id={field.name}
               name={field.name}
@@ -86,7 +86,7 @@ export function HomeAreaForm({
               type="submit"
               disabled={!canSubmit || isSubmitting || isSubmittingForm}
             >
-              {initialData ? "Update Area" : "Create Area"}
+              {initialData ? "Update Room" : "Create Room"}
             </Button>
           )}
         </form.Subscribe>

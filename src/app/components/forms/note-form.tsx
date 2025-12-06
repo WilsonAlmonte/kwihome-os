@@ -1,12 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  Input,
-  Button,
-} from "@app/components/forms";
+import { MapPin, CheckCheckIcon } from "lucide-react";
+import { Field, FieldError, Input, Button } from "@app/components/forms";
 import { RichTextEditor } from "@app/components/ui/rich-text-editor";
 import type { Note } from "@repo/features/notes/note.entity";
 import { noteSchema } from "@repo/features/notes/note.entity";
@@ -57,7 +52,6 @@ export function NoteForm({
       >
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Title</FieldLabel>
             <Input
               id={field.name}
               name={field.name}
@@ -81,7 +75,6 @@ export function NoteForm({
       >
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Content</FieldLabel>
             <RichTextEditor
               content={field.state.value}
               onChange={(value) => field.handleChange(value)}
@@ -96,24 +89,50 @@ export function NoteForm({
       <form.Field name="homeAreaId">
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Area (Optional)</FieldLabel>
-            <select
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              disabled={isSubmitting}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">No area</option>
+            <div className="grid grid-cols-2 gap-2">
+              {!initialData?.homeArea && (
+                <button
+                  type="button"
+                  onClick={() => field.handleChange("")}
+                  disabled={isSubmitting}
+                  className={`flex items-center justify-center px-3 py-2.5 text-sm rounded-lg border-2 transition-all ${
+                    field.state.value === ""
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-input hover:border-primary/50 hover:bg-accent"
+                  } ${
+                    isSubmitting
+                      ? "opacity-50 cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
+                >
+                  No Room
+                </button>
+              )}
               {homeAreas.map((area) => (
-                <option key={area.id} value={area.id}>
+                <button
+                  key={area.id}
+                  type="button"
+                  onClick={() => field.handleChange(area.id)}
+                  disabled={isSubmitting}
+                  className={`flex items-center justify-center px-3 py-2.5 text-sm rounded-lg border-2 transition-all ${
+                    field.state.value === area.id
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-input hover:border-primary/50 hover:bg-accent"
+                  } ${
+                    isSubmitting
+                      ? "opacity-50 cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
+                >
+                  {field.state.value === area.id ? (
+                    <CheckCheckIcon className="h-3.5 w-3.5 mr-1.5" />
+                  ) : (
+                    <MapPin className="h-3.5 w-3.5 mr-1.5" />
+                  )}
                   {area.name}
-                </option>
+                </button>
               ))}
-            </select>
-            <FieldError errors={field.state.meta.errors} />
+            </div>
           </Field>
         )}
       </form.Field>

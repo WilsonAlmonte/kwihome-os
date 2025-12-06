@@ -47,7 +47,9 @@ function NotesPage() {
     isOpen: false,
   });
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedAreaFilter, setSelectedAreaFilter] = useState<string>("all");
+  const [selectedAreaFilters, setSelectedAreaFilters] = useState<Set<string>>(
+    new Set(["all"])
+  );
 
   const createNoteMutation = useNoteCreation();
   const updateNoteMutation = useNoteUpdate();
@@ -88,6 +90,32 @@ function NotesPage() {
     }
   };
 
+  const toggleAreaFilter = (filterId: string) => {
+    const newFilters = new Set(selectedAreaFilters);
+
+    if (filterId === "all") {
+      // If "All Rooms" is clicked, clear all other filters
+      setSelectedAreaFilters(new Set(["all"]));
+    } else {
+      // Remove "all" if it's selected
+      newFilters.delete("all");
+
+      // Toggle the clicked filter
+      if (newFilters.has(filterId)) {
+        newFilters.delete(filterId);
+      } else {
+        newFilters.add(filterId);
+      }
+
+      // If no filters left, default to "all"
+      if (newFilters.size === 0) {
+        newFilters.add("all");
+      }
+
+      setSelectedAreaFilters(newFilters);
+    }
+  };
+
   // Filter notes based on search and area
   const filteredNotes = notes.filter((note) => {
     const matchesSearch =
@@ -96,9 +124,9 @@ function NotesPage() {
       note.content.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesArea =
-      selectedAreaFilter === "all" ||
-      (selectedAreaFilter === "none" && !note.homeArea) ||
-      note.homeArea?.id === selectedAreaFilter;
+      selectedAreaFilters.has("all") ||
+      (selectedAreaFilters.has("none") && !note.homeArea) ||
+      (note.homeArea && selectedAreaFilters.has(note.homeArea.id));
 
     return matchesSearch && matchesArea;
   });
@@ -121,8 +149,8 @@ function NotesPage() {
 
       {/* Filters */}
       {notes.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+        <div className="space-y-3">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
@@ -132,19 +160,41 @@ function NotesPage() {
               className="w-full pl-9 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
-          <select
-            value={selectedAreaFilter}
-            onChange={(e) => setSelectedAreaFilter(e.target.value)}
-            className="px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="all">All Areas</option>
-            <option value="none">No Area</option>
-            {homeAreas.map((area) => (
-              <option key={area.id} value={area.id}>
-                {area.name}
-              </option>
-            ))}
-          </select>
+
+          {/* Room Filter Buttons */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <Button
+              variant={selectedAreaFilters.has("all") ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleAreaFilter("all")}
+            >
+              All Rooms ({notes.length})
+            </Button>
+            <Button
+              variant={selectedAreaFilters.has("none") ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleAreaFilter("none")}
+            >
+              No Room ({notes.filter((n) => !n.homeArea).length})
+            </Button>
+            {homeAreas.map((area) => {
+              const count = notes.filter(
+                (n) => n.homeArea?.id === area.id
+              ).length;
+              return (
+                <Button
+                  key={area.id}
+                  variant={
+                    selectedAreaFilters.has(area.id) ? "default" : "outline"
+                  }
+                  size="sm"
+                  onClick={() => toggleAreaFilter(area.id)}
+                >
+                  {area.name} ({count})
+                </Button>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -191,12 +241,12 @@ function NotesPage() {
               className="cursor-pointer hover:shadow-md transition-shadow h-full"
               onClick={() => setViewingNote(note)}
             >
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-3 space-y-2 md:p-4 md:space-y-3">
                 <div className="space-y-1">
-                  <h3 className="font-semibold text-lg line-clamp-2">
+                  <h3 className="font-semibold text-base md:text-lg line-clamp-2">
                     {note.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3">
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">
                     {note.content.replace(/<[^>]*>/g, "")}
                   </p>
                 </div>
@@ -243,7 +293,7 @@ function NotesPage() {
         open={!!editingNote}
         onOpenChange={(open) => !open && setEditingNote(null)}
         title="Edit Note"
-        maxWidth="sm:max-w-[700px]"
+        maxWidth="sm:max-w-[1000px]"
       >
         {editingNote && (
           <NoteForm
@@ -261,6 +311,8 @@ function NotesPage() {
         open={!!viewingNote}
         onOpenChange={(open) => !open && setViewingNote(null)}
         title={viewingNote?.title || "Note"}
+        minWidth="sm:min-w-[700px]"
+        // calc(80%)
       >
         {viewingNote && (
           <div className="space-y-4">
