@@ -7,9 +7,6 @@ import {
   Italic,
   List,
   ListOrdered,
-  Heading1,
-  Heading2,
-  Heading3,
   Link as LinkIcon,
   Strikethrough,
 } from "lucide-react";
@@ -34,11 +31,7 @@ export function RichTextEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-      }),
+      StarterKit.configure({}),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -94,7 +87,9 @@ export function RichTextEditor({
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
-          className={editor.isActive("bold") ? "bg-muted" : ""}
+          className={
+            editor.isActive("bold") ? "bg-primary text-primary-foreground" : ""
+          }
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -104,7 +99,11 @@ export function RichTextEditor({
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
-          className={editor.isActive("italic") ? "bg-muted" : ""}
+          className={
+            editor.isActive("italic")
+              ? "bg-primary text-primary-foreground"
+              : ""
+          }
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -114,7 +113,11 @@ export function RichTextEditor({
           size="sm"
           onClick={() => editor.chain().focus().toggleStrike().run()}
           disabled={!editor.can().chain().focus().toggleStrike().run()}
-          className={editor.isActive("strike") ? "bg-muted" : ""}
+          className={
+            editor.isActive("strike")
+              ? "bg-primary text-primary-foreground"
+              : ""
+          }
         >
           <Strikethrough className="h-4 w-4" />
         </Button>
@@ -125,38 +128,12 @@ export function RichTextEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => editor.chain().focus().setHeading({ level: 1 }).run()}
-          className={editor.isActive("heading", { level: 1 }) ? "bg-muted" : ""}
-        >
-          <Heading1 className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().setHeading({ level: 2 }).run()}
-          className={editor.isActive("heading", { level: 2 }) ? "bg-muted" : ""}
-        >
-          <Heading2 className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => editor.chain().focus().setHeading({ level: 3 }).run()}
-          className={editor.isActive("heading", { level: 3 }) ? "bg-muted" : ""}
-        >
-          <Heading3 className="h-4 w-4" />
-        </Button>
-
-        <div className="w-px h-6 bg-border mx-1" />
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive("bulletList") ? "bg-muted" : ""}
+          className={
+            editor.isActive("bulletList")
+              ? "bg-primary text-primary-foreground"
+              : ""
+          }
         >
           <List className="h-4 w-4" />
         </Button>
@@ -165,7 +142,11 @@ export function RichTextEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive("orderedList") ? "bg-muted" : ""}
+          className={
+            editor.isActive("orderedList")
+              ? "bg-primary text-primary-foreground"
+              : ""
+          }
         >
           <ListOrdered className="h-4 w-4" />
         </Button>
