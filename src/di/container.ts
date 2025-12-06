@@ -1,5 +1,10 @@
 import GetDashboardDataUseCase from "@repo/features/dashboard/get-dashboard-data.use-case";
 import { HomeAreasRepository } from "@repo/features/home-areas/home-areas.port";
+import { InventoryRepository } from "@repo/features/inventory/inventory.port";
+import {
+  ToggleInventoryStatusUseCase,
+  MarkAsNotNeededUseCase,
+} from "@repo/features/inventory/inventory.use-cases";
 import { NotesRepository } from "@repo/features/notes/notes.port";
 import {
   MarkTaskCompleteUseCase,
@@ -7,9 +12,11 @@ import {
 } from "@repo/features/tasks/task.use-cases";
 import { TasksRepository } from "@repo/features/tasks/tasks.port";
 import { prismaHomeAreasRepository } from "@repo/infrastructure/prisma/home-areas.repository.prisma";
+import { prismaInventoryRepository } from "@repo/infrastructure/prisma/inventory.repository.prisma";
 import { prismaNotesRepository } from "@repo/infrastructure/prisma/notes.repository.prisma";
 import { prismaTasksRepository } from "@repo/infrastructure/prisma/tasks.repository.prisma";
 import { mockHomeAreasRepository } from "@repo/test/mocks/home-areas.repository.mock";
+import { mockInventoryRepository } from "@repo/test/mocks/inventory.repository.mock";
 import { mockNotesRepository } from "@repo/test/mocks/notes.repository.mock";
 import { mockTasksRepository } from "@repo/test/mocks/tasks.repository.mock";
 
@@ -21,7 +28,7 @@ const USE_MOCK: Record<keyof typeof repoRegistry, boolean> = {
   homeAreas: false,
   tasks: false,
   notes: false,
-  // inventory: true,
+  inventory: true,
   // shoppingList: true,
 } as const;
 
@@ -43,6 +50,10 @@ const repoRegistry = {
     mock: mockNotesRepository,
     real: prismaNotesRepository,
   } satisfies RepoEntry<NotesRepository>,
+  inventory: {
+    mock: mockInventoryRepository,
+    real: prismaInventoryRepository,
+  } satisfies RepoEntry<InventoryRepository>,
 } as const;
 
 type RepoKey = keyof typeof repoRegistry;
@@ -59,12 +70,15 @@ export interface Repositories {
   homeAreas: HomeAreasRepository;
   tasks: TasksRepository;
   notes: NotesRepository;
+  inventory: InventoryRepository;
 }
 
 export interface UseCases {
   getDashboardData: GetDashboardDataUseCase;
   markTaskComplete: MarkTaskCompleteUseCase;
   markTaskPending: MarkTaskPendingUseCase;
+  toggleInventoryStatus: ToggleInventoryStatusUseCase;
+  markAsNotNeeded: MarkAsNotNeededUseCase;
 }
 
 export interface AppContainer {
@@ -82,12 +96,15 @@ function createContainer(): AppContainer {
     homeAreas: resolve("homeAreas"),
     tasks: resolve("tasks"),
     notes: resolve("notes"),
+    inventory: resolve("inventory"),
   };
 
   const useCases: UseCases = {
     getDashboardData: new GetDashboardDataUseCase(repos),
     markTaskComplete: new MarkTaskCompleteUseCase(repos.tasks),
     markTaskPending: new MarkTaskPendingUseCase(repos.tasks),
+    toggleInventoryStatus: new ToggleInventoryStatusUseCase(repos.inventory),
+    markAsNotNeeded: new MarkAsNotNeededUseCase(repos.inventory),
   };
 
   return {
