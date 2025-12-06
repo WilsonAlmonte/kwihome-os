@@ -85,7 +85,7 @@ export function RichTextEditor({
   };
 
   return (
-    <div className="border rounded-md overflow-hidden max-w-full">
+    <div className="border rounded-md overflow-hidden max-w-full max-h-[500px] overflow-y-auto">
       {/* Toolbar */}
       <div className="border-b bg-muted/50 p-2 flex flex-wrap gap-1">
         <Button

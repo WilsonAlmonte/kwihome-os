@@ -243,7 +243,7 @@ function NotesPage() {
         open={!!editingNote}
         onOpenChange={(open) => !open && setEditingNote(null)}
         title="Edit Note"
-        maxWidth="sm:max-w-[700px]"
+        maxWidth="sm:max-w-[1000px]"
       >
         {editingNote && (
           <NoteForm
@@ -261,6 +261,8 @@ function NotesPage() {
         open={!!viewingNote}
         onOpenChange={(open) => !open && setViewingNote(null)}
         title={viewingNote?.title || "Note"}
+        minWidth="sm:min-w-[700px]"
+        // calc(80%)
       >
         {viewingNote && (
           <div className="space-y-4">

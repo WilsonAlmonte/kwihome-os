@@ -31,6 +31,7 @@ interface ResponsiveDialogProps {
   cancelText?: string;
   onCancel?: () => void;
   maxWidth?: string;
+  minWidth?: string;
 }
 
 export function ResponsiveDialog({
@@ -44,6 +45,7 @@ export function ResponsiveDialog({
   cancelText = "Cancel",
   onCancel,
   maxWidth = "sm:max-w-[425px]",
+  minWidth = "sm:min-w-[300px]",
 }: ResponsiveDialogProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -55,7 +57,7 @@ export function ResponsiveDialog({
     return (
       <Dialog open={openState} onOpenChange={setOpenState}>
         {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-        <DialogContent className={maxWidth}>
+        <DialogContent className={maxWidth + " " + minWidth}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             {description && (
@@ -69,14 +71,19 @@ export function ResponsiveDialog({
   }
 
   return (
-    <Drawer open={openState} onOpenChange={setOpenState}>
+    <Drawer
+      open={openState}
+      onOpenChange={setOpenState}
+      modal={true}
+      repositionInputs={false}
+    >
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent style={{ paddingBottom: "16px" }}>
+      <DrawerContent className="max-h-[90dvh] pb-2 fixed bottom-0 left-0 right-0  flex flex-col">
         <DrawerHeader className="text-left">
           <DrawerTitle>{title}</DrawerTitle>
           {description && <DrawerDescription>{description}</DrawerDescription>}
         </DrawerHeader>
-        <div className="px-4">{children}</div>
+        <div className="px-4 overflow-y-auto flex-1">{children}</div>
         {showFooter && (
           <DrawerFooter className="pt-2">
             <DrawerClose asChild>

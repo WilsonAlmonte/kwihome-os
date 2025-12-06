@@ -57,7 +57,6 @@ export function NoteForm({
       >
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Title</FieldLabel>
             <Input
               id={field.name}
               name={field.name}
@@ -81,7 +80,6 @@ export function NoteForm({
       >
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Content</FieldLabel>
             <RichTextEditor
               content={field.state.value}
               onChange={(value) => field.handleChange(value)}
