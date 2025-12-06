@@ -324,7 +324,7 @@ function HomePage() {
             <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
               <CardHeader className="pb-1 p-3 md:p-4 md:pb-2">
                 <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
-                  Shopping List
+                  Items in Shopping List
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 pt-0 md:p-4 md:pt-0">
