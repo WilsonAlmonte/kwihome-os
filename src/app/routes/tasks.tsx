@@ -125,7 +125,7 @@ function TaskForm({
       <form.Field name="homeAreaId">
         {(field) => (
           <Field>
-            <FieldLabel htmlFor={field.name}>Home Area (Optional)</FieldLabel>
+            <FieldLabel htmlFor={field.name}>Room (Optional)</FieldLabel>
             <select
               id={field.name}
               name={field.name}
@@ -142,7 +142,7 @@ function TaskForm({
               disabled={isSubmitting}
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             >
-              {!initialData?.homeArea && <option value="">No area</option>}
+              {!initialData?.homeArea && <option value="">No room</option>}
               {homeAreas.map((area) => (
                 <option key={area.id} value={area.id}>
                   {area.name}
@@ -296,24 +296,24 @@ function TasksPage() {
           })
         }
       >
-        <CardContent className="flex items-start gap-3 p-4">
+        <CardContent className="flex items-start gap-2 p-3 md:gap-3 md:p-4">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleToggleComplete(task);
             }}
-            className="shrink-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer p-1 -m-1 hover:bg-accent rounded-md"
+            className="shrink-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer p-0.5 -m-0.5 hover:bg-accent rounded-md md:p-1 md:-m-1"
           >
             {task.completed ? (
-              <CheckCircle2 className="h-6 w-6 text-primary" />
+              <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             ) : (
-              <Circle className="h-6 w-6" />
+              <Circle className="h-5 w-5 md:h-6 md:w-6" />
             )}
           </button>
 
           <div className="flex-1 min-w-0">
             <h3
-              className={`font-medium wrap-break-word ${
+              className={`font-medium wrap-break-word text-sm md:text-base ${
                 task.completed ? "line-through text-muted-foreground" : ""
               }`}
             >
@@ -325,7 +325,7 @@ function TasksPage() {
               </p>
             )}
             {task.homeArea && (
-              <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1 mt-1.5 md:mt-2 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" />
                 <span>{task.homeArea.name}</span>
               </div>

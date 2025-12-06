@@ -180,7 +180,7 @@ function InventoryForm({
                       : "cursor-pointer"
                   }`}
                 >
-                  No area
+                  No Room
                 </button>
               )}
               {homeAreas.map((area) => (
@@ -439,7 +439,7 @@ function InventoryPage() {
           })
         }
       >
-        <CardContent className="flex items-start gap-3 p-4">
+        <CardContent className="flex items-start gap-2 p-3 md:gap-3 md:p-4">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -447,7 +447,7 @@ function InventoryPage() {
                 handleToggleStatus(item);
               }
             }}
-            className={`shrink-0 text-muted-foreground hover:text-primary transition-colors p-1 -m-1 hover:bg-accent rounded-md ${
+            className={`shrink-0 text-muted-foreground hover:text-primary transition-colors p-0.5 -m-0.5 hover:bg-accent rounded-md md:p-1 md:-m-1 ${
               item.status === InventoryStatus.NOT_NEEDED
                 ? "cursor-default opacity-50"
                 : "cursor-pointer"
@@ -455,21 +455,23 @@ function InventoryPage() {
             disabled={item.status === InventoryStatus.NOT_NEEDED}
           >
             {item.status === InventoryStatus.IN_STOCK ? (
-              <CheckCircle2 className="h-6 w-6 text-success" />
+              <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-success" />
             ) : item.status === InventoryStatus.OUT_OF_STOCK ? (
-              <XCircle className="h-6 w-6 text-destructive" />
+              <XCircle className="h-5 w-5 md:h-6 md:w-6 text-destructive" />
             ) : (
-              <Circle className="h-6 w-6" />
+              <Circle className="h-5 w-5 md:h-6 md:w-6" />
             )}
           </button>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-medium wrap-break-word">{item.name}</h3>
+              <h3 className="font-medium wrap-break-word text-sm md:text-base">
+                {item.name}
+              </h3>
               {getStatusBadge(item.status)}
             </div>
             {item.homeArea && (
-              <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1 mt-1.5 md:mt-2 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" />
                 <span>{item.homeArea.name}</span>
               </div>

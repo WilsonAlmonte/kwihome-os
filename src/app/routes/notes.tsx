@@ -137,8 +137,8 @@ function NotesPage() {
             onChange={(e) => setSelectedAreaFilter(e.target.value)}
             className="px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="all">All Areas</option>
-            <option value="none">No Area</option>
+            <option value="all">All Rooms</option>
+            <option value="none">No Room</option>
             {homeAreas.map((area) => (
               <option key={area.id} value={area.id}>
                 {area.name}
@@ -191,12 +191,12 @@ function NotesPage() {
               className="cursor-pointer hover:shadow-md transition-shadow h-full"
               onClick={() => setViewingNote(note)}
             >
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-3 space-y-2 md:p-4 md:space-y-3">
                 <div className="space-y-1">
-                  <h3 className="font-semibold text-lg line-clamp-2">
+                  <h3 className="font-semibold text-base md:text-lg line-clamp-2">
                     {note.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3">
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-3">
                     {note.content.replace(/<[^>]*>/g, "")}
                   </p>
                 </div>

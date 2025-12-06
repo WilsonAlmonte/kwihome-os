@@ -110,18 +110,18 @@ function HomePage() {
           id: addDialogProps.initialData.id,
           name: data.name,
         });
-        toast.success("Home area updated", {
+        toast.success("Room updated", {
           description: `${data.name} has been updated.`,
         });
       } else {
         await createHomeArea.mutateAsync(data.name);
-        toast.success("Home area created", {
-          description: `${data.name} has been added to your home areas.`,
+        toast.success("Room created", {
+          description: `${data.name} has been added to your rooms.`,
         });
       }
       setAddDialogProps({ isOpen: false, initialData: undefined });
     } catch (error) {
-      toast.error("Failed to create home area", {
+      toast.error("Failed to create room", {
         description:
           "Please try again or contact support if the problem persists.",
       });
@@ -133,12 +133,12 @@ function HomePage() {
 
     try {
       await deleteHomeArea.mutateAsync(deleteDialogProps.area.id);
-      toast.success("Home area deleted", {
+      toast.success("Room deleted", {
         description: `${deleteDialogProps.area.name} has been removed.`,
       });
       setDeleteDialogProps({ isOpen: false, area: undefined });
     } catch (error) {
-      toast.error("Failed to delete home area", {
+      toast.error("Failed to delete room", {
         description:
           "Please try again or contact support if the problem persists.",
       });
@@ -201,14 +201,16 @@ function HomePage() {
             return (
               <Link key={item.to} to={item.to} className="group">
                 <Card className="h-full shadow-sm bg-card/80 transition-all hover:shadow-md active:scale-[0.98] group-hover:border-primary/50">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3 md:p-4">
                     <div
-                      className={`inline-flex h-10 w-10 items-center justify-center rounded-lg ${item.bgColor} mb-3`}
+                      className={`inline-flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-lg ${item.bgColor} mb-2 md:mb-3`}
                     >
-                      <Icon className={`h-5 w-5 ${item.color}`} />
+                      <Icon className={`h-4 w-4 md:h-5 md:w-5 ${item.color}`} />
                     </div>
-                    <h3 className="font-bold">{item.label}</h3>
-                    <p className="text-xs text-muted-foreground mt-1 hidden md:block">
+                    <h3 className="font-bold text-sm md:text-base">
+                      {item.label}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5 md:mt-1 hidden md:block">
                       {item.description}
                     </p>
                   </CardContent>
@@ -219,11 +221,11 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Add Home Area Dialog */}
+      {/* Add Room Dialog */}
       <ResponsiveDialog
         open={addDialogProps.isOpen}
         onOpenChange={(open) => setAddDialogProps({ isOpen: open })}
-        title={addDialogProps.initialData ? "Edit Home Area" : "Add Home Area"}
+        title={addDialogProps.initialData ? "Edit Room" : "Add Room"}
         description="Manage the rooms and spaces in your home."
       >
         <HomeAreaForm
@@ -240,7 +242,7 @@ function HomePage() {
       <ResponsiveDialog
         open={deleteDialogProps.isOpen}
         onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
-        title="Delete Home Area"
+        title="Delete Room"
         description={`Are you sure you want to delete "${deleteDialogProps.area?.name}"? This action cannot be undone.`}
       >
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4">
@@ -269,7 +271,7 @@ function HomePage() {
           <BarChart3 className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold">At a Glance</h2>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <Card
             role="button"
             onClick={
@@ -279,34 +281,61 @@ function HomePage() {
             }
             className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
           >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Home Areas
+            <CardHeader className="pb-1 p-3 md:p-4 md:pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
+                Rooms
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 pt-0 md:p-4 md:pt-0">
               {stats.totalHomeAreas > 0 ? (
-                <p className="text-2xl font-bold">{stats.totalHomeAreas}</p>
+                <p className="text-xl md:text-2xl font-bold">
+                  {stats.totalHomeAreas}
+                </p>
               ) : (
-                <a className="text-sm text-muted-foreground">Add areas →</a>
+                <a className="text-xs md:text-sm text-muted-foreground">
+                  Add areas →
+                </a>
               )}
             </CardContent>
           </Card>
 
-          <Link to="/shopping">
+          <Link to="/tasks">
             <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Shopping List items
+              <CardHeader className="pb-1 p-3 md:p-4 md:pb-2">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
+                  Pending Tasks
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 pt-0 md:p-4 md:pt-0">
+                {stats.pendingTasks > 0 ? (
+                  <p className="text-xl md:text-2xl font-bold">
+                    {stats.pendingTasks}
+                  </p>
+                ) : (
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    No tasks →
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/shopping">
+            <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
+              <CardHeader className="pb-1 p-3 md:p-4 md:pb-2">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
+                  Shopping List
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 pt-0 md:p-4 md:pt-0">
                 {stats.itemsInShoppingList > 0 ? (
-                  <p className="text-2xl font-bold">
+                  <p className="text-xl md:text-2xl font-bold">
                     {stats.itemsInShoppingList}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Start list →</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    Start list →
+                  </p>
                 )}
               </CardContent>
             </Card>
@@ -314,16 +343,20 @@ function HomePage() {
 
           <Link to="/notes">
             <Card className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardHeader className="pb-1 p-3 md:p-4 md:pb-2">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
                   Notes
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 pt-0 md:p-4 md:pt-0">
                 {stats.totalNotes > 0 ? (
-                  <p className="text-2xl font-bold">{stats.totalNotes}</p>
+                  <p className="text-xl md:text-2xl font-bold">
+                    {stats.totalNotes}
+                  </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Add note →</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">
+                    Add note →
+                  </p>
                 )}
               </CardContent>
             </Card>
@@ -331,12 +364,12 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Home Areas Section */}
+      {/* Rooms Section */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Home className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">Home Areas</h2>
+            <h2 className="text-lg font-semibold">Rooms</h2>
             {homeAreas.length > 0 && (
               <span className="text-sm text-muted-foreground">
                 ({homeAreas.length})
@@ -351,7 +384,7 @@ function HomePage() {
               onClick={() => setAddDialogProps({ isOpen: true })}
             >
               <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Add Area</span>
+              <span className="hidden sm:inline">Add Room</span>
             </Button>
           )}
         </div>
@@ -362,7 +395,7 @@ function HomePage() {
               {visibleAreas.map((area) => {
                 const cardContent = (
                   <Card className="transition-all hover:shadow-sm hover:border-primary/50">
-                    <CardContent className="flex items-center justify-between p-4">
+                    <CardContent className="flex items-center justify-between p-3 md:p-4">
                       <div
                         role="button"
                         tabIndex={0}
@@ -372,12 +405,14 @@ function HomePage() {
                             initialData: { ...area },
                           })
                         }
-                        className="flex items-center gap-3 flex-1 cursor-pointer"
+                        className="flex items-center gap-2 md:gap-3 flex-1 cursor-pointer"
                       >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                        <div className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-lg bg-muted">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
                         </div>
-                        <span className="font-medium">{area.name}</span>
+                        <span className="font-medium text-sm md:text-base">
+                          {area.name}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         {!isMobile && (
@@ -435,7 +470,7 @@ function HomePage() {
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
                 <Home className="h-7 w-7 text-primary" />
               </div>
-              <h3 className="font-semibold mb-1">No home areas yet</h3>
+              <h3 className="font-semibold mb-1">No rooms yet</h3>
               <p className="text-sm text-muted-foreground mb-4 max-w-[280px]">
                 Start by adding the rooms and spaces you use most, like Kitchen,
                 Living Room, or Garage.
@@ -446,7 +481,7 @@ function HomePage() {
                 onClick={() => setAddDialogProps({ isOpen: true })}
               >
                 <Plus className="h-4 w-4" />
-                Add your first area
+                Add your first room
               </Button>
             </CardContent>
           </Card>
