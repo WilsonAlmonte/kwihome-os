@@ -22,17 +22,22 @@ export default class GetDashboardDataUseCase {
   }
 
   async execute(): Promise<DashboardData> {
-    const homeAreasStats = await this._homeAreasRepo.getStats();
-    const uncompletedTasksCount = await this._tasksRepo.countUncompleted();
-    const totalNotes = await this._notesRepo.count();
-    const outOfStockItems = await this._inventoryRepo.countByStatus(
-      InventoryStatus.OUT_OF_STOCK
-    );
-    const itemsInShoppingList =
-      await this._shoppingListsRepo.countItemsInActiveList();
+    const [
+      homeAreasStats,
+      uncompletedTasksCount,
+      totalNotes,
+      outOfStockItems,
+      itemsInShoppingList,
+    ] = await Promise.all([
+      this._homeAreasRepo.getStats(),
+      this._tasksRepo.countUncompleted(),
+      this._notesRepo.count(),
+      this._inventoryRepo.countByStatus(InventoryStatus.OUT_OF_STOCK),
+      this._shoppingListsRepo.countItemsInActiveList(),
+    ]);
+
     return {
       totalHomeAreas: homeAreasStats.total,
-      // This is a mock implementation that's temporary; replace with real data fetching logic
       outOfStockItems,
       pendingTasks: uncompletedTasksCount,
       itemsInShoppingList:
