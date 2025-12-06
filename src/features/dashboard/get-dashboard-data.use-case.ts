@@ -35,7 +35,8 @@ export default class GetDashboardDataUseCase {
       // This is a mock implementation that's temporary; replace with real data fetching logic
       outOfStockItems,
       pendingTasks: uncompletedTasksCount,
-      itemsInShoppingList,
+      itemsInShoppingList:
+        itemsInShoppingList > 0 ? itemsInShoppingList : outOfStockItems,
       totalNotes,
     };
   }

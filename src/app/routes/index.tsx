@@ -328,11 +328,9 @@ function HomePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 pt-0 md:p-4 md:pt-0">
-                {stats.itemsInShoppingList > 0 || stats.outOfStockItems > 0 ? (
+                {stats.itemsInShoppingList > 0 ? (
                   <p className="text-xl md:text-2xl font-bold">
-                    {stats.itemsInShoppingList > 0
-                      ? stats.itemsInShoppingList
-                      : stats.outOfStockItems}
+                    {stats.itemsInShoppingList}
                   </p>
                 ) : (
                   <p className="text-xs md:text-sm text-muted-foreground">
