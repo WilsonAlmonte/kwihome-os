@@ -6,6 +6,18 @@ import {
   MarkAsNotNeededUseCase,
 } from "@repo/features/inventory/inventory.use-cases";
 import { NotesRepository } from "@repo/features/notes/notes.port";
+import { ShoppingListsRepository } from "@repo/features/shopping-lists/shopping-lists.port";
+import {
+  GetOrCreateDraftUseCase,
+  AddItemToShoppingListUseCase,
+  RemoveItemFromShoppingListUseCase,
+  ToggleItemCheckedUseCase,
+  StartShoppingTripUseCase,
+  CompleteShoppingTripUseCase,
+  AbandonDraftUseCase,
+  GetShoppingHistoryUseCase,
+  CancelShoppingTripUseCase,
+} from "@repo/features/shopping-lists/shopping-list.use-cases";
 import {
   MarkTaskCompleteUseCase,
   MarkTaskPendingUseCase,
@@ -14,10 +26,12 @@ import { TasksRepository } from "@repo/features/tasks/tasks.port";
 import { prismaHomeAreasRepository } from "@repo/infrastructure/prisma/home-areas.repository.prisma";
 import { prismaInventoryRepository } from "@repo/infrastructure/prisma/inventory.repository.prisma";
 import { prismaNotesRepository } from "@repo/infrastructure/prisma/notes.repository.prisma";
+import { prismaShoppingListsRepository } from "@repo/infrastructure/prisma/shopping-lists.repository.prisma";
 import { prismaTasksRepository } from "@repo/infrastructure/prisma/tasks.repository.prisma";
 import { mockHomeAreasRepository } from "@repo/test/mocks/home-areas.repository.mock";
 import { mockInventoryRepository } from "@repo/test/mocks/inventory.repository.mock";
 import { mockNotesRepository } from "@repo/test/mocks/notes.repository.mock";
+import { mockShoppingListsRepository } from "@repo/test/mocks/shopping-lists.repository.mock";
 import { mockTasksRepository } from "@repo/test/mocks/tasks.repository.mock";
 
 // ============================================
@@ -29,7 +43,7 @@ const USE_MOCK: Record<keyof typeof repoRegistry, boolean> = {
   tasks: false,
   notes: false,
   inventory: false,
-  // shoppingList: true,
+  shoppingLists: true,
 } as const;
 
 // ============================================
@@ -54,6 +68,10 @@ const repoRegistry = {
     mock: mockInventoryRepository,
     real: prismaInventoryRepository,
   } satisfies RepoEntry<InventoryRepository>,
+  shoppingLists: {
+    mock: mockShoppingListsRepository,
+    real: prismaShoppingListsRepository,
+  } satisfies RepoEntry<ShoppingListsRepository>,
 } as const;
 
 type RepoKey = keyof typeof repoRegistry;
@@ -71,6 +89,7 @@ export interface Repositories {
   tasks: TasksRepository;
   notes: NotesRepository;
   inventory: InventoryRepository;
+  shoppingLists: ShoppingListsRepository;
 }
 
 export interface UseCases {
@@ -79,6 +98,16 @@ export interface UseCases {
   markTaskPending: MarkTaskPendingUseCase;
   toggleInventoryStatus: ToggleInventoryStatusUseCase;
   markAsNotNeeded: MarkAsNotNeededUseCase;
+  // Shopping list use cases
+  getOrCreateDraft: GetOrCreateDraftUseCase;
+  addItemToShoppingList: AddItemToShoppingListUseCase;
+  removeItemFromShoppingList: RemoveItemFromShoppingListUseCase;
+  toggleItemChecked: ToggleItemCheckedUseCase;
+  startShoppingTrip: StartShoppingTripUseCase;
+  completeShoppingTrip: CompleteShoppingTripUseCase;
+  abandonDraft: AbandonDraftUseCase;
+  getShoppingHistory: GetShoppingHistoryUseCase;
+  cancelShoppingTrip: CancelShoppingTripUseCase;
 }
 
 export interface AppContainer {
@@ -97,14 +126,36 @@ function createContainer(): AppContainer {
     tasks: resolve("tasks"),
     notes: resolve("notes"),
     inventory: resolve("inventory"),
+    shoppingLists: resolve("shoppingLists"),
   };
 
   const useCases: UseCases = {
     getDashboardData: new GetDashboardDataUseCase(repos),
     markTaskComplete: new MarkTaskCompleteUseCase(repos.tasks),
     markTaskPending: new MarkTaskPendingUseCase(repos.tasks),
-    toggleInventoryStatus: new ToggleInventoryStatusUseCase(repos.inventory),
+    toggleInventoryStatus: new ToggleInventoryStatusUseCase(
+      repos.inventory,
+      repos.shoppingLists
+    ),
     markAsNotNeeded: new MarkAsNotNeededUseCase(repos.inventory),
+    // Shopping list use cases
+    getOrCreateDraft: new GetOrCreateDraftUseCase(repos.shoppingLists),
+    addItemToShoppingList: new AddItemToShoppingListUseCase(
+      repos.shoppingLists,
+      repos.inventory
+    ),
+    removeItemFromShoppingList: new RemoveItemFromShoppingListUseCase(
+      repos.shoppingLists
+    ),
+    toggleItemChecked: new ToggleItemCheckedUseCase(repos.shoppingLists),
+    startShoppingTrip: new StartShoppingTripUseCase(repos.shoppingLists),
+    completeShoppingTrip: new CompleteShoppingTripUseCase(
+      repos.shoppingLists,
+      repos.inventory
+    ),
+    abandonDraft: new AbandonDraftUseCase(repos.shoppingLists),
+    getShoppingHistory: new GetShoppingHistoryUseCase(repos.shoppingLists),
+    cancelShoppingTrip: new CancelShoppingTripUseCase(repos.shoppingLists),
   };
 
   return {

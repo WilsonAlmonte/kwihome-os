@@ -23,3 +23,4 @@ export { Button } from "@app/components/ui/button";
 // Domain Forms
 export { HomeAreaForm } from "./home-area-form";
 export { NoteForm } from "./note-form";
+export { ShoppingListItemForm } from "./shopping-list-item-form";
