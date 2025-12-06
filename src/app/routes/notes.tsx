@@ -13,6 +13,7 @@ import {
 import { Card, CardContent } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
+import { ConfirmationDialog } from "@app/components/ui/confirmation-dialog";
 import { Swipeable } from "@app/components/ui/swipeable";
 import { notesQueryOptions } from "../features/notes/notes.query";
 import { homeAreasQueryOptions } from "../features/home-areas/home-areas.query";
@@ -39,6 +40,12 @@ function NotesPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
+  const [deleteDialogProps, setDeleteDialogProps] = useState<{
+    isOpen: boolean;
+    note?: Note;
+  }>({
+    isOpen: false,
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAreaFilter, setSelectedAreaFilter] = useState<string>("all");
 
@@ -68,13 +75,14 @@ function NotesPage() {
     }
   };
 
-  const handleDeleteNote = async (noteId: string) => {
-    if (!confirm("Are you sure you want to delete this note?")) return;
+  const handleDeleteNote = async () => {
+    if (!deleteDialogProps.note) return;
 
     try {
-      await deleteNoteMutation.mutateAsync(noteId);
+      await deleteNoteMutation.mutateAsync(deleteDialogProps.note.id);
       setViewingNote(null);
       setEditingNote(null);
+      setDeleteDialogProps({ isOpen: false, note: undefined });
     } catch (error) {
       console.error("Failed to delete note:", error);
     }
@@ -177,7 +185,7 @@ function NotesPage() {
         {filteredNotes.map((note) => (
           <Swipeable
             key={note.id}
-            onSwipeLeft={() => handleDeleteNote(note.id)}
+            onSwipeLeft={() => setDeleteDialogProps({ isOpen: true, note })}
           >
             <Card
               className="cursor-pointer hover:shadow-md transition-shadow h-full"
@@ -189,7 +197,7 @@ function NotesPage() {
                     {note.title}
                   </h3>
                   <p className="text-sm text-muted-foreground line-clamp-3">
-                    {note.content.replace(/<[^>]*>/g, '')}
+                    {note.content.replace(/<[^>]*>/g, "")}
                   </p>
                 </div>
 
@@ -290,7 +298,10 @@ function NotesPage() {
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => handleDeleteNote(viewingNote.id)}
+                onClick={() => {
+                  setDeleteDialogProps({ isOpen: true, note: viewingNote });
+                  setViewingNote(null);
+                }}
                 className="gap-1.5 flex-1"
               >
                 <Trash2 className="h-4 w-4" />
@@ -300,6 +311,21 @@ function NotesPage() {
           </div>
         )}
       </ResponsiveDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialogProps.isOpen}
+        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        title="Delete Note"
+        description={`Are you sure you want to delete "${deleteDialogProps.note?.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={handleDeleteNote}
+        onCancel={() =>
+          setDeleteDialogProps({ isOpen: false, note: undefined })
+        }
+        isLoading={deleteNoteMutation.isPending}
+      />
     </div>
   );
 }
