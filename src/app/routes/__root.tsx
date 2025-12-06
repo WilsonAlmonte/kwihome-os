@@ -62,7 +62,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={Route.useRouteContext().queryClient}>
           {children}
         </QueryClientProvider>
-        <Toaster />
+        <Toaster position="top-center" />
         <TanStackDevtools
           config={{
             position: "bottom-right",
