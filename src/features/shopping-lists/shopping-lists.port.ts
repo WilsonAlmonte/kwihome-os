@@ -47,4 +47,6 @@ export interface ShoppingListsRepository {
     items: CreateShoppingListItemData[]
   ): Promise<ShoppingListItem[]>;
   uncheckAllItems(listId: string): Promise<void>;
+
+  countItemsInActiveList(): Promise<number>;
 }

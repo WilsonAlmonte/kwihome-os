@@ -292,4 +292,11 @@ export const prismaShoppingListsRepository: ShoppingListsRepository = {
       },
     });
   },
+  countItemsInActiveList: async function () {
+    const activeList = await this.findActiveList();
+    if (!activeList) {
+      return 0;
+    }
+    return activeList.items.length;
+  },
 };

@@ -237,6 +237,22 @@ export const mockShoppingListsRepository: ShoppingListsRepository = {
       return item;
     });
   },
+  countItemsInActiveList: async function () {
+    const activeList = mockShoppingLists.find(
+      (l) =>
+        (l.status === ShoppingListStatus.DRAFT ||
+          l.status === ShoppingListStatus.ACTIVE) &&
+        !l.deletedAt
+    );
+
+    if (!activeList) return 0;
+
+    const itemCount = mockShoppingListItems.filter(
+      (i) => i.shoppingListId === activeList.id && !i.deletedAt
+    ).length;
+
+    return itemCount;
+  },
 };
 
 // Helper to reset mock data (useful for testing)
