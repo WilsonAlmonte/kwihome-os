@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { toast } from "sonner";
 import {
   ShoppingCart,
@@ -57,11 +56,11 @@ function ShoppingPage() {
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
   const isMobile = useMediaQuery("(max-width: 1023px)");
 
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const addDialog = useDialogState();
   const deleteDialog = useDialogState<ShoppingListItem>();
-  const [abandonDialogOpen, setAbandonDialogOpen] = useState(false);
-  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const abandonDialog = useDialogState();
+  const completeDialog = useDialogState();
+  const cancelDialog = useDialogState();
 
   const addItem = useAddShoppingListItem();
   const removeItem = useRemoveShoppingListItem();
@@ -169,7 +168,7 @@ function ShoppingPage() {
       toast.success("Shopping complete!", {
         description: `${checkedCount} items marked as in stock.`,
       });
-      setCompleteDialogOpen(false);
+      completeDialog.close();
     } catch (error) {
       toast.error("Failed to complete shopping", {
         description: "Please try again.",
@@ -183,7 +182,7 @@ function ShoppingPage() {
       toast.success("Draft cleared", {
         description: "Your shopping list has been cleared.",
       });
-      setAbandonDialogOpen(false);
+      abandonDialog.close();
     } catch (error) {
       toast.error("Failed to clear list", {
         description: "Please try again.",
@@ -197,7 +196,7 @@ function ShoppingPage() {
       toast.success("Shopping trip cancelled", {
         description: "Your list has been returned to draft mode.",
       });
-      setCancelDialogOpen(false);
+      cancelDialog.close();
     } catch (error) {
       toast.error("Failed to cancel shopping", {
         description: "Please try again.",
@@ -327,12 +326,12 @@ function ShoppingPage() {
           </p>
         </div>
 
-        <ShoppingListEmpty onAddItems={() => setAddDialogOpen(true)} />
+        <ShoppingListEmpty onAddItems={() => addDialog.open()} />
 
         {/* Add Item Dialog */}
         <ResponsiveDialog
-          open={addDialogOpen}
-          onOpenChange={setAddDialogOpen}
+          open={addDialog.isOpen}
+          onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}
           title="Add Items"
           description="Add items to your shopping list."
         >
@@ -340,7 +339,7 @@ function ShoppingPage() {
             homeAreas={homeAreas}
             inventoryItems={availableInventoryItems}
             onSubmit={handleAddItem}
-            onCancel={() => setAddDialogOpen(false)}
+            onCancel={() => addDialog.close()}
             isSubmitting={addItem.isPending}
           />
         </ResponsiveDialog>
@@ -403,7 +402,7 @@ function ShoppingPage() {
             <Button
               size="lg"
               className="w-full gap-2 h-14 text-lg font-semibold"
-              onClick={() => setCompleteDialogOpen(true)}
+              onClick={() => completeDialog.open()}
             >
               <PartyPopper className="h-5 w-5" />
               I'M DONE!
@@ -411,7 +410,7 @@ function ShoppingPage() {
             <Button
               variant="ghost"
               className="w-full gap-2 text-muted-foreground"
-              onClick={() => setCancelDialogOpen(true)}
+              onClick={() => cancelDialog.open()}
             >
               <XCircle className="h-4 w-4" />
               Cancel Shopping
@@ -420,8 +419,10 @@ function ShoppingPage() {
         </div>
         {/* Complete Confirmation */}
         <ConfirmationDialog
-          open={completeDialogOpen}
-          onOpenChange={setCompleteDialogOpen}
+          open={completeDialog.isOpen}
+          onOpenChange={(open) =>
+            open ? completeDialog.open() : completeDialog.close()
+          }
           title="Complete Shopping Trip?"
           description={
             <div className="space-y-3">
@@ -447,8 +448,10 @@ function ShoppingPage() {
         />
         {/* Cancel Shopping Confirmation */}
         <ConfirmationDialog
-          open={cancelDialogOpen}
-          onOpenChange={setCancelDialogOpen}
+          open={cancelDialog.isOpen}
+          onOpenChange={(open) =>
+            open ? cancelDialog.open() : cancelDialog.close()
+          }
           title="Cancel Shopping Trip?"
           description="Your shopping trip will be cancelled and returned to draft mode. All items will be unchecked."
           confirmLabel="Cancel Trip"
@@ -476,7 +479,7 @@ function ShoppingPage() {
           size="sm"
           variant="outline"
           className="gap-1.5"
-          onClick={() => setAddDialogOpen(true)}
+          onClick={() => addDialog.open()}
         >
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">Add Items</span>
@@ -511,7 +514,7 @@ function ShoppingPage() {
           <Button
             variant="ghost"
             className="w-full text-muted-foreground"
-            onClick={() => setAbandonDialogOpen(true)}
+            onClick={() => abandonDialog.open()}
           >
             <XCircle className="h-4 w-4 mr-2" />
             Clear List
@@ -521,8 +524,8 @@ function ShoppingPage() {
 
       {/* Add Items Dialog */}
       <ResponsiveDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
+        open={addDialog.isOpen}
+        onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}
         title="Add Items"
         description="Add an item to your shopping list."
       >
@@ -530,7 +533,7 @@ function ShoppingPage() {
           homeAreas={homeAreas}
           inventoryItems={availableInventoryItems}
           onSubmit={handleAddItem}
-          onCancel={() => setAddDialogOpen(false)}
+          onCancel={() => addDialog.close()}
           isSubmitting={addItem.isPending}
         />
       </ResponsiveDialog>
@@ -551,8 +554,10 @@ function ShoppingPage() {
 
       {/* Abandon Draft Confirmation */}
       <ConfirmationDialog
-        open={abandonDialogOpen}
-        onOpenChange={setAbandonDialogOpen}
+        open={abandonDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? abandonDialog.open() : abandonDialog.close()
+        }
         title="Clear Shopping List?"
         description="This will remove all items from your current shopping list. Items will remain in your inventory."
         confirmLabel="Clear"

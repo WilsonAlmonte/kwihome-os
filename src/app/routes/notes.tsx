@@ -31,7 +31,7 @@ export const Route = createFileRoute("/notes")({
 function NotesPage() {
   const { data: notes } = useSuspenseQuery(notesQueryOptions());
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const createDialog = useDialogState();
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
   const deleteDialog = useDialogState<Note>();
@@ -49,7 +49,7 @@ function NotesPage() {
   const handleCreateNote = async (data: NoteInput) => {
     try {
       await createNoteMutation.mutateAsync(data);
-      setIsCreateDialogOpen(false);
+      createDialog.close();
     } catch (error) {
       console.error("Failed to create note:", error);
     }
@@ -130,7 +130,7 @@ function NotesPage() {
             Save important information about your home
           </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-1.5">
+        <Button onClick={() => createDialog.open()} className="gap-1.5">
           <Plus className="h-4 w-4" />
           {isDesktop && "Add Note"}
         </Button>
@@ -190,14 +190,14 @@ function NotesPage() {
       {/* Notes List */}
       {filteredNotes.length === 0 && notes.length === 0 && (
         <NotesEmpty
-          onCreateNote={() => setIsCreateDialogOpen(true)}
+          onCreateNote={() => createDialog.open()}
           isFirstNote={true}
         />
       )}
 
       {filteredNotes.length === 0 && notes.length > 0 && (
         <NotesEmpty
-          onCreateNote={() => setIsCreateDialogOpen(true)}
+          onCreateNote={() => createDialog.open()}
           isFirstNote={false}
         />
       )}
@@ -244,15 +244,17 @@ function NotesPage() {
 
       {/* Create Dialog */}
       <ResponsiveDialog
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
+        open={createDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? createDialog.open() : createDialog.close()
+        }
         title="Create Note"
         maxWidth="sm:max-w-[700px]"
       >
         <NoteForm
           homeAreas={homeAreas}
           onSubmit={handleCreateNote}
-          onCancel={() => setIsCreateDialogOpen(false)}
+          onCancel={() => createDialog.close()}
           isSubmitting={createNoteMutation.isPending}
         />
       </ResponsiveDialog>
