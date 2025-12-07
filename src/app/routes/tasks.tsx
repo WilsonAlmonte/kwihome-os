@@ -38,6 +38,7 @@ import {
   HomeAreaSelector,
   FormActions,
 } from "@app/components/forms";
+import { useDialogState } from "../hooks/use-dialog-state";
 
 export const Route = createFileRoute("/tasks")({
   component: TasksPage,
@@ -160,21 +161,11 @@ function TasksPage() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const [showCompleted, setShowCompleted] = useState(false);
-  const [addDialogProps, setAddDialogProps] = useState<{
-    isOpen: boolean;
-    initialData?: Task;
-  }>({
-    isOpen: false,
-  });
-  const [deleteDialogProps, setDeleteDialogProps] = useState<{
-    isOpen: boolean;
-    task?: Task;
-  }>({
-    isOpen: false,
-  });
+  const addDialog = useDialogState<Task>();
+  const deleteDialog = useDialogState<Task>();
 
   const createTask = useTaskCreation(() => {
-    setAddDialogProps({ isOpen: false, initialData: undefined });
+    addDialog.close();
   });
   const updateTask = useTaskUpdate();
   const deleteTask = useTaskDeletion();
@@ -190,9 +181,9 @@ function TasksPage() {
         ? homeAreas.find((area) => area.id === data.homeAreaId)
         : undefined;
 
-      if (addDialogProps.initialData) {
+      if (addDialog.data) {
         await updateTask.mutateAsync({
-          id: addDialogProps.initialData.id,
+          id: addDialog.data.id,
           updates: {
             title: data.title,
             description: data.description || undefined,
@@ -202,7 +193,7 @@ function TasksPage() {
         toast.success("Task updated", {
           description: `${data.title} has been updated.`,
         });
-        setAddDialogProps({ isOpen: false, initialData: undefined });
+        addDialog.close();
       } else {
         await createTask.mutateAsync({
           title: data.title,
@@ -222,14 +213,14 @@ function TasksPage() {
   };
 
   const handleTaskDelete = async () => {
-    if (!deleteDialogProps.task) return;
+    if (!deleteDialog.data) return;
 
     try {
-      await deleteTask.mutateAsync(deleteDialogProps.task.id);
+      await deleteTask.mutateAsync(deleteDialog.data.id);
       toast.success("Task deleted", {
-        description: `${deleteDialogProps.task.title} has been removed.`,
+        description: `${deleteDialog.data.title} has been removed.`,
       });
-      setDeleteDialogProps({ isOpen: false, task: undefined });
+      deleteDialog.close();
     } catch (error) {
       toast.error("Failed to delete task", {
         description:
@@ -262,12 +253,7 @@ function TasksPage() {
     const cardContent = (
       <Card
         className="transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
-        onClick={() =>
-          setAddDialogProps({
-            isOpen: true,
-            initialData: { ...task },
-          })
-        }
+        onClick={() => addDialog.open(task)}
       >
         <CardContent className="flex items-start gap-2 p-3 md:gap-3 md:p-4">
           <button
@@ -322,10 +308,7 @@ function TasksPage() {
                 className="text-muted-foreground hover:text-primary"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setAddDialogProps({
-                    isOpen: true,
-                    initialData: { ...task },
-                  });
+                  addDialog.open(task);
                 }}
               >
                 <Edit className="h-4 w-4" />
@@ -336,7 +319,7 @@ function TasksPage() {
                 className="text-muted-foreground hover:text-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setDeleteDialogProps({ isOpen: true, task });
+                  deleteDialog.open(task);
                 }}
               >
                 <Trash2 className="h-4 w-4" />
@@ -350,7 +333,7 @@ function TasksPage() {
     return isMobile ? (
       <Swipeable
         key={task.id}
-        onSwipeLeft={() => setDeleteDialogProps({ isOpen: true, task })}
+        onSwipeLeft={() => deleteDialog.open(task)}
         leftAction={
           <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
             <Trash2 className="h-5 w-5 text-destructive-foreground" />
@@ -377,7 +360,7 @@ function TasksPage() {
           <Button
             size="sm"
             className="gap-1.5"
-            onClick={() => setAddDialogProps({ isOpen: true })}
+            onClick={() => addDialog.open()}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add Task</span>
@@ -387,36 +370,34 @@ function TasksPage() {
 
       {/* Add/Edit Task Dialog */}
       <ResponsiveDialog
-        open={addDialogProps.isOpen}
-        onOpenChange={(open) =>
-          setAddDialogProps({ isOpen: open, initialData: undefined })
-        }
-        title={addDialogProps.initialData ? "Edit Task" : "Add Task"}
+        open={addDialog.isOpen}
+        onOpenChange={(open) => {
+          if (!open) addDialog.close();
+        }}
+        title={addDialog.data ? "Edit Task" : "Add Task"}
         description="Keep track of household to-dos and maintenance tasks."
       >
         <TaskForm
-          initialData={addDialogProps.initialData}
+          initialData={addDialog.data}
           homeAreas={homeAreas}
           onSubmit={handleTaskSubmit}
-          onCancel={() =>
-            setAddDialogProps({ isOpen: false, initialData: undefined })
-          }
+          onCancel={() => addDialog.close()}
           isSubmitting={createTask.isPending || updateTask.isPending}
         />
       </ResponsiveDialog>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
-        open={deleteDialogProps.isOpen}
-        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) => {
+          if (!open) deleteDialog.close();
+        }}
         title="Delete Task"
-        description={`Are you sure you want to delete "${deleteDialogProps.task?.title}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete "${deleteDialog.data?.title}"? This action cannot be undone.`}
         confirmLabel="Delete"
         variant="destructive"
         onConfirm={handleTaskDelete}
-        onCancel={() =>
-          setDeleteDialogProps({ isOpen: false, task: undefined })
-        }
+        onCancel={() => deleteDialog.close()}
         isLoading={deleteTask.isPending}
       />
 
@@ -447,7 +428,7 @@ function TasksPage() {
                 <Button
                   size="sm"
                   className="gap-1.5"
-                  onClick={() => setAddDialogProps({ isOpen: true })}
+                  onClick={() => addDialog.open()}
                 >
                   <Plus className="h-4 w-4" />
                   Add a task
@@ -495,7 +476,7 @@ function TasksPage() {
             <Button
               size="sm"
               className="gap-1.5"
-              onClick={() => setAddDialogProps({ isOpen: true })}
+              onClick={() => addDialog.open()}
             >
               <Plus className="h-4 w-4" />
               Add your first task

@@ -28,6 +28,7 @@ import {
   useMarkAsNotNeeded,
 } from "../features/inventory/inventory.hooks";
 import { useMediaQuery } from "../hooks/use-media-query";
+import { useDialogState } from "../hooks/use-dialog-state";
 import {
   InventoryItem,
   inventoryItemSchema,
@@ -241,21 +242,11 @@ function InventoryPage() {
   const [filterStatus, setFilterStatus] = useState<"all" | InventoryStatus>(
     "all"
   );
-  const [addDialogProps, setAddDialogProps] = useState<{
-    isOpen: boolean;
-    initialData?: InventoryItem;
-  }>({
-    isOpen: false,
-  });
-  const [deleteDialogProps, setDeleteDialogProps] = useState<{
-    isOpen: boolean;
-    item?: InventoryItem;
-  }>({
-    isOpen: false,
-  });
+  const addDialog = useDialogState<InventoryItem>();
+  const deleteDialog = useDialogState<InventoryItem>();
 
   const createItem = useInventoryItemCreation(() => {
-    setAddDialogProps({ isOpen: false, initialData: undefined });
+    addDialog.close();
   });
   const updateItem = useInventoryItemUpdate();
   const deleteItem = useInventoryItemDeletion();
@@ -288,9 +279,9 @@ function InventoryPage() {
         ? homeAreas.find((area) => area.id === data.homeAreaId)
         : undefined;
 
-      if (addDialogProps.initialData) {
+      if (addDialog.data) {
         await updateItem.mutateAsync({
-          id: addDialogProps.initialData.id,
+          id: addDialog.data.id,
           updates: {
             name: data.name,
             status: data.status,
@@ -300,7 +291,7 @@ function InventoryPage() {
         toast.success("Item updated", {
           description: `${data.name} has been updated.`,
         });
-        setAddDialogProps({ isOpen: false, initialData: undefined });
+        addDialog.close();
       } else {
         await createItem.mutateAsync({
           name: data.name,
@@ -320,14 +311,14 @@ function InventoryPage() {
   };
 
   const handleItemDelete = async () => {
-    if (!deleteDialogProps.item) return;
+    if (!deleteDialog.data) return;
 
     try {
-      await deleteItem.mutateAsync(deleteDialogProps.item.id);
+      await deleteItem.mutateAsync(deleteDialog.data.id);
       toast.success("Item deleted", {
-        description: `${deleteDialogProps.item.name} has been removed.`,
+        description: `${deleteDialog.data.name} has been removed.`,
       });
-      setDeleteDialogProps({ isOpen: false, item: undefined });
+      deleteDialog.close();
     } catch (error) {
       toast.error("Failed to delete item", {
         description:
@@ -360,7 +351,7 @@ function InventoryPage() {
       toast.success("Marked as not needed", {
         description: `${item.name} is now marked as not needed.`,
       });
-      setAddDialogProps({ isOpen: false, initialData: undefined });
+      addDialog.close();
     } catch (error) {
       toast.error("Failed to update status", {
         description: "Please try again.",
@@ -398,12 +389,7 @@ function InventoryPage() {
     const cardContent = (
       <Card
         className="transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
-        onClick={() =>
-          setAddDialogProps({
-            isOpen: true,
-            initialData: { ...item },
-          })
-        }
+        onClick={() => addDialog.open(item)}
       >
         <CardContent className="flex items-start gap-2 p-3 md:gap-3 md:p-4">
           <button
@@ -452,10 +438,7 @@ function InventoryPage() {
                 className="text-muted-foreground hover:text-primary"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setAddDialogProps({
-                    isOpen: true,
-                    initialData: { ...item },
-                  });
+                  addDialog.open(item);
                 }}
               >
                 <Edit className="h-4 w-4" />
@@ -466,7 +449,7 @@ function InventoryPage() {
                 className="text-muted-foreground hover:text-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setDeleteDialogProps({ isOpen: true, item });
+                  deleteDialog.open(item);
                 }}
               >
                 <Trash2 className="h-4 w-4" />
@@ -480,7 +463,7 @@ function InventoryPage() {
     return isMobile ? (
       <Swipeable
         key={item.id}
-        onSwipeLeft={() => setDeleteDialogProps({ isOpen: true, item })}
+        onSwipeLeft={() => deleteDialog.open(item)}
         leftAction={
           <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
             <Trash2 className="h-5 w-5 text-destructive-foreground" />
@@ -507,7 +490,7 @@ function InventoryPage() {
           <Button
             size="sm"
             className="gap-1.5"
-            onClick={() => setAddDialogProps({ isOpen: true })}
+            onClick={() => addDialog.open()}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add Item</span>
@@ -517,23 +500,21 @@ function InventoryPage() {
 
       {/* Add/Edit Item Dialog */}
       <ResponsiveDialog
-        open={addDialogProps.isOpen}
-        onOpenChange={(open) =>
-          setAddDialogProps({ isOpen: open, initialData: undefined })
-        }
-        title={addDialogProps.initialData ? "Edit Item" : "Add Item"}
+        open={addDialog.isOpen}
+        onOpenChange={(open) => {
+          if (!open) addDialog.close();
+        }}
+        title={addDialog.data ? "Edit Item" : "Add Item"}
         description="Manage items you regularly purchase for your household."
       >
         <InventoryForm
-          initialData={addDialogProps.initialData}
+          initialData={addDialog.data}
           homeAreas={homeAreas}
           onSubmit={handleItemSubmit}
-          onCancel={() =>
-            setAddDialogProps({ isOpen: false, initialData: undefined })
-          }
+          onCancel={() => addDialog.close()}
           onMarkAsNotNeeded={
-            addDialogProps.initialData
-              ? () => handleMarkAsNotNeeded(addDialogProps.initialData!)
+            addDialog.data
+              ? () => handleMarkAsNotNeeded(addDialog.data!)
               : undefined
           }
           isSubmitting={
@@ -546,16 +527,16 @@ function InventoryPage() {
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
-        open={deleteDialogProps.isOpen}
-        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) => {
+          if (!open) deleteDialog.close();
+        }}
         title="Delete Item"
-        description={`Are you sure you want to delete "${deleteDialogProps.item?.name}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete "${deleteDialog.data?.name}"? This action cannot be undone.`}
         confirmLabel="Delete"
         variant="destructive"
         onConfirm={handleItemDelete}
-        onCancel={() =>
-          setDeleteDialogProps({ isOpen: false, item: undefined })
-        }
+        onCancel={() => deleteDialog.close()}
         isLoading={deleteItem.isPending}
       />
 
@@ -634,7 +615,7 @@ function InventoryPage() {
             <Button
               size="sm"
               className="gap-1.5"
-              onClick={() => setAddDialogProps({ isOpen: true })}
+              onClick={() => addDialog.open()}
             >
               <Plus className="h-4 w-4" />
               Add your first item

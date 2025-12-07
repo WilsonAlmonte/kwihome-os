@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { HomeArea } from "@repo/features/home-areas/home-area.entity";
 import { dashboardDataQueryOptions } from "../features/dashboard/dashboard.query";
 import { useMediaQuery } from "../hooks/use-media-query";
+import { useDialogState } from "../hooks/use-dialog-state";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -90,24 +91,14 @@ function HomePage() {
   const { data: stats } = useSuspenseQuery(dashboardDataQueryOptions());
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const [showAllAreas, setShowAllAreas] = useState(false);
-  const [addDialogProps, setAddDialogProps] = useState<{
-    isOpen: boolean;
-    initialData?: HomeArea;
-  }>({
-    isOpen: false,
-  });
-  const [deleteDialogProps, setDeleteDialogProps] = useState<{
-    isOpen: boolean;
-    area?: HomeArea;
-  }>({
-    isOpen: false,
-  });
+  const addDialog = useDialogState<HomeArea>();
+  const deleteDialog = useDialogState<HomeArea>();
 
   const handleHomeAreaSubmit = async (data: { name: string }) => {
     try {
-      if (addDialogProps.initialData) {
+      if (addDialog.data) {
         await updateHomeArea.mutateAsync({
-          id: addDialogProps.initialData.id,
+          id: addDialog.data.id,
           name: data.name,
         });
         toast.success("Room updated", {
@@ -119,7 +110,7 @@ function HomePage() {
           description: `${data.name} has been added to your rooms.`,
         });
       }
-      setAddDialogProps({ isOpen: false, initialData: undefined });
+      addDialog.close();
     } catch (error) {
       toast.error("Failed to create room", {
         description:
@@ -129,14 +120,14 @@ function HomePage() {
   };
 
   const handleHomeAreaDelete = async () => {
-    if (!deleteDialogProps.area) return;
+    if (!deleteDialog.data) return;
 
     try {
-      await deleteHomeArea.mutateAsync(deleteDialogProps.area.id);
+      await deleteHomeArea.mutateAsync(deleteDialog.data.id);
       toast.success("Room deleted", {
-        description: `${deleteDialogProps.area.name} has been removed.`,
+        description: `${deleteDialog.data.name} has been removed.`,
       });
-      setDeleteDialogProps({ isOpen: false, area: undefined });
+      deleteDialog.close();
     } catch (error) {
       toast.error("Failed to delete room", {
         description:
@@ -223,34 +214,32 @@ function HomePage() {
 
       {/* Add Room Dialog */}
       <ResponsiveDialog
-        open={addDialogProps.isOpen}
-        onOpenChange={(open) => setAddDialogProps({ isOpen: open })}
-        title={addDialogProps.initialData ? "Edit Room" : "Add Room"}
+        open={addDialog.isOpen}
+        onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}
+        title={addDialog.data ? "Edit Room" : "Add Room"}
         description="Manage the rooms and spaces in your home."
       >
         <HomeAreaForm
-          initialData={addDialogProps.initialData}
+          initialData={addDialog.data}
           onSubmit={handleHomeAreaSubmit}
-          onCancel={() =>
-            setAddDialogProps({ isOpen: false, initialData: undefined })
-          }
+          onCancel={() => addDialog.close()}
           isSubmitting={createHomeArea.isPending || updateHomeArea.isPending}
         />
       </ResponsiveDialog>
 
       {/* Delete Confirmation Dialog */}
       <ResponsiveDialog
-        open={deleteDialogProps.isOpen}
-        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? deleteDialog.open() : deleteDialog.close()
+        }
         title="Delete Room"
-        description={`Are you sure you want to delete "${deleteDialogProps.area?.name}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete "${deleteDialog.data?.name}"? This action cannot be undone.`}
       >
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4">
           <Button
             variant="outline"
-            onClick={() =>
-              setDeleteDialogProps({ isOpen: false, area: undefined })
-            }
+            onClick={() => deleteDialog.close()}
             disabled={deleteHomeArea.isPending}
           >
             Cancel
@@ -275,9 +264,7 @@ function HomePage() {
           <Card
             role="button"
             onClick={
-              stats.totalHomeAreas === 0
-                ? () => setAddDialogProps({ isOpen: true })
-                : () => {}
+              stats.totalHomeAreas === 0 ? () => addDialog.open() : () => {}
             }
             className="h-full transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
           >
@@ -381,7 +368,7 @@ function HomePage() {
               variant="ghost"
               size="sm"
               className="gap-1"
-              onClick={() => setAddDialogProps({ isOpen: true })}
+              onClick={() => addDialog.open()}
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Add Room</span>
@@ -399,12 +386,7 @@ function HomePage() {
                       <div
                         role="button"
                         tabIndex={0}
-                        onClick={() =>
-                          setAddDialogProps({
-                            isOpen: true,
-                            initialData: { ...area },
-                          })
-                        }
+                        onClick={() => addDialog.open({ ...area })}
                         className="flex items-center gap-2 md:gap-3 flex-1 cursor-pointer"
                       >
                         <div className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-lg bg-muted">
@@ -422,7 +404,7 @@ function HomePage() {
                             className="h-8 w-8 text-muted-foreground hover:text-destructive"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setDeleteDialogProps({ isOpen: true, area });
+                              deleteDialog.open(area);
                             }}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -437,9 +419,7 @@ function HomePage() {
                 return isMobile ? (
                   <Swipeable
                     key={area.id}
-                    onSwipeLeft={() =>
-                      setDeleteDialogProps({ isOpen: true, area })
-                    }
+                    onSwipeLeft={() => deleteDialog.open(area)}
                     leftAction={
                       <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
                         <Trash2 className="h-5 w-5 text-destructive-foreground" />
@@ -478,7 +458,7 @@ function HomePage() {
               <Button
                 size="sm"
                 className="gap-1.5"
-                onClick={() => setAddDialogProps({ isOpen: true })}
+                onClick={() => addDialog.open()}
               >
                 <Plus className="h-4 w-4" />
                 Add your first room

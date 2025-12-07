@@ -25,6 +25,7 @@ import {
 import { useMediaQuery } from "../hooks/use-media-query";
 import type { Note, NoteInput } from "@repo/features/notes/note.entity";
 import { NoteForm } from "@app/components/forms";
+import { useDialogState } from "../hooks/use-dialog-state";
 
 export const Route = createFileRoute("/notes")({
   component: NotesPage,
@@ -40,12 +41,7 @@ function NotesPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
-  const [deleteDialogProps, setDeleteDialogProps] = useState<{
-    isOpen: boolean;
-    note?: Note;
-  }>({
-    isOpen: false,
-  });
+  const deleteDialog = useDialogState<Note>();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAreaFilters, setSelectedAreaFilters] = useState<Set<string>>(
     new Set(["all"])
@@ -78,13 +74,13 @@ function NotesPage() {
   };
 
   const handleDeleteNote = async () => {
-    if (!deleteDialogProps.note) return;
+    if (!deleteDialog.data) return;
 
     try {
-      await deleteNoteMutation.mutateAsync(deleteDialogProps.note.id);
+      await deleteNoteMutation.mutateAsync(deleteDialog.data.id);
       setViewingNote(null);
       setEditingNote(null);
-      setDeleteDialogProps({ isOpen: false, note: undefined });
+      deleteDialog.close();
     } catch (error) {
       console.error("Failed to delete note:", error);
     }
@@ -233,10 +229,7 @@ function NotesPage() {
       {/* Grid layout for notes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredNotes.map((note) => (
-          <Swipeable
-            key={note.id}
-            onSwipeLeft={() => setDeleteDialogProps({ isOpen: true, note })}
-          >
+          <Swipeable key={note.id} onSwipeLeft={() => deleteDialog.open(note)}>
             <Card
               className="cursor-pointer hover:shadow-md transition-shadow h-full"
               onClick={() => setViewingNote(note)}
@@ -351,7 +344,7 @@ function NotesPage() {
               <Button
                 variant="destructive"
                 onClick={() => {
-                  setDeleteDialogProps({ isOpen: true, note: viewingNote });
+                  deleteDialog.open(viewingNote);
                   setViewingNote(null);
                 }}
                 className="gap-1.5 flex-1"
@@ -366,16 +359,16 @@ function NotesPage() {
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
-        open={deleteDialogProps.isOpen}
-        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? deleteDialog.open() : deleteDialog.close()
+        }
         title="Delete Note"
-        description={`Are you sure you want to delete "${deleteDialogProps.note?.title}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete "${deleteDialog.data?.title}"? This action cannot be undone.`}
         confirmLabel="Delete"
         variant="destructive"
         onConfirm={handleDeleteNote}
-        onCancel={() =>
-          setDeleteDialogProps({ isOpen: false, note: undefined })
-        }
+        onCancel={() => deleteDialog.close()}
         isLoading={deleteNoteMutation.isPending}
       />
     </div>

@@ -39,6 +39,7 @@ import {
   CreateShoppingListItemInput,
 } from "@repo/features/shopping-lists/shopping-list.entity";
 import { InventoryStatus } from "@repo/features/inventory/inventory-item.entity";
+import { useDialogState } from "../hooks/use-dialog-state";
 
 export const Route = createFileRoute("/shopping")({
   component: ShoppingPage,
@@ -56,10 +57,7 @@ function ShoppingPage() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [deleteDialogProps, setDeleteDialogProps] = useState<{
-    isOpen: boolean;
-    item?: ShoppingListItem;
-  }>({ isOpen: false });
+  const deleteDialog = useDialogState<ShoppingListItem>();
   const [abandonDialogOpen, setAbandonDialogOpen] = useState(false);
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -119,17 +117,17 @@ function ShoppingPage() {
   };
 
   const handleRemoveItem = async () => {
-    if (!deleteDialogProps.item) return;
+    if (!deleteDialog.data) return;
 
     try {
       await removeItem.mutateAsync({
-        itemId: deleteDialogProps.item.id,
+        itemId: deleteDialog.data.id,
         listId: shoppingList.id,
       });
       toast.success("Item removed", {
-        description: `${deleteDialogProps.item.name} has been removed.`,
+        description: `${deleteDialog.data.name} has been removed.`,
       });
-      setDeleteDialogProps({ isOpen: false });
+      deleteDialog.close();
     } catch (error) {
       toast.error("Failed to remove item", {
         description: "Please try again.",
@@ -288,7 +286,7 @@ function ShoppingPage() {
               className="text-muted-foreground hover:text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
-                setDeleteDialogProps({ isOpen: true, item });
+                deleteDialog.open(item);
               }}
             >
               <Trash2 className="h-4 w-4" />
@@ -302,7 +300,7 @@ function ShoppingPage() {
       return (
         <Swipeable
           key={item.id}
-          onSwipeLeft={() => setDeleteDialogProps({ isOpen: true, item })}
+          onSwipeLeft={() => deleteDialog.open(item)}
           leftAction={
             <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
               <Trash2 className="h-5 w-5 text-destructive-foreground" />
@@ -557,10 +555,12 @@ function ShoppingPage() {
 
       {/* Delete Confirmation */}
       <ConfirmationDialog
-        open={deleteDialogProps.isOpen}
-        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? deleteDialog.open() : deleteDialog.close()
+        }
         title="Remove Item"
-        description={`Are you sure you want to remove "${deleteDialogProps.item?.name}" from your shopping list?`}
+        description={`Are you sure you want to remove "${deleteDialog.data?.name}" from your shopping list?`}
         confirmLabel="Remove"
         variant="destructive"
         onConfirm={handleRemoveItem}
