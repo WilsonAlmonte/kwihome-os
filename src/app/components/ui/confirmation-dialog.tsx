@@ -51,7 +51,7 @@ export function ConfirmationDialog({
           {cancelLabel}
         </Button>
         <Button variant={variant} onClick={handleConfirm} disabled={isLoading}>
-          {isLoading ? `${confirmLabel}ing...` : confirmLabel}
+          {isLoading ? `${confirmLabel}` : confirmLabel}
         </Button>
       </div>
     </ResponsiveDialog>

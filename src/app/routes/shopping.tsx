@@ -40,6 +40,7 @@ import {
 } from "@repo/features/shopping-lists/shopping-list.entity";
 import { InventoryStatus } from "@repo/features/inventory/inventory-item.entity";
 import { useDialogState } from "../hooks/use-dialog-state";
+import { ShoppingItemCard } from "../components/cards/shopping-item-card";
 
 export const Route = createFileRoute("/shopping")({
   component: ShoppingPage,
@@ -204,117 +205,6 @@ function ShoppingPage() {
     }
   };
 
-  const renderItem = (item: ShoppingListItem) => {
-    // Compact view for active shopping mode
-    if (isActive) {
-      return (
-        <div key={item.id}>
-          <Card
-            className={`transition-all cursor-pointer ${
-              item.checked
-                ? "bg-muted/50 border-muted"
-                : "hover:shadow-sm hover:border-primary/50"
-            }`}
-            onClick={() => handleToggleChecked(item)}
-          >
-            <CardContent className="flex items-center gap-2 px-2 md:p-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleChecked(item);
-                }}
-                className="shrink-0"
-              >
-                {item.checked ? (
-                  <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-success" />
-                ) : (
-                  <Circle className="h-5 w-5 md:h-6 md:w-6 text-muted-foreground hover:text-primary transition-colors" />
-                )}
-              </button>
-              <span
-                className={`text-sm md:text-base ${
-                  item.checked ? "line-through text-muted-foreground" : ""
-                }`}
-              >
-                {item.name}
-              </span>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
-
-    // Full view for draft mode
-    const cardContent = (
-      <Card
-        className={`transition-all ${
-          item.checked
-            ? "bg-muted/50 border-muted"
-            : "hover:shadow-sm hover:border-primary/50"
-        }`}
-      >
-        <CardContent className="flex items-center gap-3 p-3 md:p-4">
-          <div className="shrink-0">
-            {item.inventoryItem ? (
-              <Package className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <ShoppingCart className="h-5 w-5 text-muted-foreground" />
-            )}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm md:text-base">{item.name}</h3>
-            <div className="flex items-center gap-2 mt-0.5">
-              {item.homeArea && (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  {item.homeArea.name}
-                </span>
-              )}
-              {item.inventoryItem && (
-                <span className="text-xs text-muted-foreground">
-                  • From inventory
-                </span>
-              )}
-            </div>
-          </div>
-
-          {isDraft && !isMobile && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground hover:text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteDialog.open(item);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    );
-
-    if (isDraft && isMobile) {
-      return (
-        <Swipeable
-          key={item.id}
-          onSwipeLeft={() => deleteDialog.open(item)}
-          leftAction={
-            <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
-              <Trash2 className="h-5 w-5 text-destructive-foreground" />
-            </div>
-          }
-        >
-          {cardContent}
-        </Swipeable>
-      );
-    }
-
-    return <div key={item.id}>{cardContent}</div>;
-  };
-
   // Empty state
   if (shoppingList.items.length === 0) {
     return (
@@ -365,7 +255,18 @@ function ShoppingPage() {
         {/* Items List */}
         <div className="space-y-2">
           {/* Unchecked items first */}
-          {shoppingList.items.filter((item) => !item.checked).map(renderItem)}
+          {shoppingList.items
+            .filter((item) => !item.checked)
+            .map((item) => (
+              <ShoppingItemCard
+                item={item}
+                isActive={isActive}
+                isDraft={isDraft}
+                isMobile={isMobile}
+                handleToggleChecked={handleToggleChecked}
+                openDeleteDialog={deleteDialog.open}
+              />
+            ))}
 
           {/* Checked items at bottom */}
           {checkedCount > 0 && (
@@ -379,7 +280,16 @@ function ShoppingPage() {
               </div>
               {shoppingList.items
                 .filter((item) => item.checked)
-                .map(renderItem)}
+                .map((item) => (
+                  <ShoppingItemCard
+                    item={item}
+                    isActive={isActive}
+                    isDraft={isDraft}
+                    isMobile={isMobile}
+                    handleToggleChecked={handleToggleChecked}
+                    openDeleteDialog={deleteDialog.open}
+                  />
+                ))}
             </>
           )}
         </div>
@@ -506,7 +416,18 @@ function ShoppingPage() {
       </Card>
 
       {/* Items List */}
-      <div className="space-y-2">{shoppingList.items.map(renderItem)}</div>
+      <div className="space-y-2">
+        {shoppingList.items.map((item) => (
+          <ShoppingItemCard
+            item={item}
+            isActive={isActive}
+            isDraft={isDraft}
+            isMobile={isMobile}
+            handleToggleChecked={handleToggleChecked}
+            openDeleteDialog={deleteDialog.open}
+          />
+        ))}
+      </div>
 
       {/* Clear List Button */}
       {!isVirtualDraft && (
