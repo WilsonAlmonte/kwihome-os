@@ -110,3 +110,25 @@ export const useMarkAsNotNeeded = () => {
     },
   });
 };
+
+export const useInventoryStats = (items: InventoryItem[]) => {
+  const activeItems = items.filter(
+    (item) => item.status !== InventoryStatus.NOT_NEEDED
+  );
+  const inStockCount = items.filter(
+    (item) => item.status === InventoryStatus.IN_STOCK
+  ).length;
+  const outOfStockCount = items.filter(
+    (item) => item.status === InventoryStatus.OUT_OF_STOCK
+  ).length;
+  const notNeededCount = items.filter(
+    (item) => item.status === InventoryStatus.NOT_NEEDED
+  ).length;
+
+  return {
+    activeItems,
+    inStockCount,
+    outOfStockCount,
+    notNeededCount,
+  };
+};

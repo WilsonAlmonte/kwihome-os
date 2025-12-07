@@ -14,6 +14,7 @@ import {
   useInventoryItemDeletion,
   useToggleInventoryStatus,
   useMarkAsNotNeeded,
+  useInventoryStats,
 } from "../features/inventory/inventory.hooks";
 import { InventoryEmpty } from "../features/inventory/inventory-empty";
 import { useDialogState } from "../hooks/use-dialog-state";
@@ -60,18 +61,8 @@ function InventoryPage() {
     return item.status === filterStatus;
   });
 
-  const activeItems = items.filter(
-    (item) => item.status !== InventoryStatus.NOT_NEEDED
-  );
-  const inStockCount = items.filter(
-    (item) => item.status === InventoryStatus.IN_STOCK
-  ).length;
-  const outOfStockCount = items.filter(
-    (item) => item.status === InventoryStatus.OUT_OF_STOCK
-  ).length;
-  const notNeededCount = items.filter(
-    (item) => item.status === InventoryStatus.NOT_NEEDED
-  ).length;
+  const { activeItems, inStockCount, outOfStockCount, notNeededCount } =
+    useInventoryStats(items);
 
   const handleItemSubmit = async (data: InventoryFormData) => {
     try {

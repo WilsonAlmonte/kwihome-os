@@ -32,7 +32,10 @@ import {
   ShoppingListStatus,
   CreateShoppingListItemInput,
 } from "@repo/features/shopping-lists/shopping-list.entity";
-import { InventoryStatus } from "@repo/features/inventory/inventory-item.entity";
+import {
+  InventoryItem,
+  InventoryStatus,
+} from "@repo/features/inventory/inventory-item.entity";
 import { useDialogState } from "../hooks/use-dialog-state";
 import { ShoppingItemCard } from "../components/cards/shopping-item-card";
 
@@ -202,32 +205,13 @@ function ShoppingPage() {
   // Empty state
   if (shoppingList.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Shopping</h1>
-          <p className="text-muted-foreground mt-1">
-            Create and manage your shopping lists
-          </p>
-        </div>
-
-        <ShoppingListEmpty onAddItems={() => addDialog.open()} />
-
-        {/* Add Item Dialog */}
-        <ResponsiveDialog
-          open={addDialog.isOpen}
-          onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}
-          title="Add Items"
-          description="Add items to your shopping list."
-        >
-          <ShoppingListItemForm
-            homeAreas={homeAreas}
-            inventoryItems={availableInventoryItems}
-            onSubmit={handleAddItem}
-            onCancel={() => addDialog.close()}
-            isSubmitting={addItem.isPending}
-          />
-        </ResponsiveDialog>
-      </div>
+      <EmptyShoppingView
+        addDialog={addDialog}
+        homeAreas={homeAreas}
+        availableInventoryItems={availableInventoryItems}
+        handleAddItem={handleAddItem}
+        addItem={addItem}
+      />
     );
   }
 
@@ -480,6 +464,52 @@ function ShoppingPage() {
         onConfirm={handleAbandonDraft}
         isLoading={abandonDraft.isPending}
       />
+    </div>
+  );
+}
+
+interface EmptyShoppingViewProps {
+  addDialog: ReturnType<typeof useDialogState>;
+  homeAreas: Array<{ id: string; name: string }>;
+  availableInventoryItems: InventoryItem[];
+  handleAddItem: (data: CreateShoppingListItemInput) => Promise<void>;
+  addItem: {
+    isPending: boolean;
+  };
+}
+function EmptyShoppingView({
+  addDialog,
+  homeAreas,
+  availableInventoryItems,
+  handleAddItem,
+  addItem,
+}: EmptyShoppingViewProps) {
+  return (
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Shopping</h1>
+        <p className="text-muted-foreground mt-1">
+          Create and manage your shopping lists
+        </p>
+      </div>
+
+      <ShoppingListEmpty onAddItems={() => addDialog.open()} />
+
+      {/* Add Item Dialog */}
+      <ResponsiveDialog
+        open={addDialog.isOpen}
+        onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}
+        title="Add Items"
+        description="Add items to your shopping list."
+      >
+        <ShoppingListItemForm
+          homeAreas={homeAreas}
+          inventoryItems={availableInventoryItems}
+          onSubmit={handleAddItem}
+          onCancel={() => addDialog.close()}
+          isSubmitting={addItem.isPending}
+        />
+      </ResponsiveDialog>
     </div>
   );
 }
