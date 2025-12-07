@@ -42,9 +42,9 @@ import { ShoppingItemCard } from "../components/cards/shopping-item-card";
 export const Route = createFileRoute("/shopping")({
   component: ShoppingPage,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(shoppingListQueryOptions());
-    context.queryClient.prefetchQuery(inventoryQueryOptions());
     context.queryClient.prefetchQuery(homeAreasQueryOptions());
+    context.queryClient.prefetchQuery(inventoryQueryOptions());
+    await context.queryClient.ensureQueryData(shoppingListQueryOptions());
   },
 });
 

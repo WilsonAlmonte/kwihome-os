@@ -24,8 +24,8 @@ import { TaskItemCard } from "../components/cards/task-item-card";
 export const Route = createFileRoute("/tasks")({
   component: TasksPage,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(tasksQueryOptions());
     context.queryClient.prefetchQuery(homeAreasQueryOptions());
+    await context.queryClient.ensureQueryData(tasksQueryOptions());
   },
 });
 

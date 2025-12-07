@@ -23,8 +23,8 @@ import { useDialogState } from "../hooks/use-dialog-state";
 export const Route = createFileRoute("/notes")({
   component: NotesPage,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(notesQueryOptions());
     context.queryClient.prefetchQuery(homeAreasQueryOptions());
+    await context.queryClient.ensureQueryData(notesQueryOptions());
   },
 });
 

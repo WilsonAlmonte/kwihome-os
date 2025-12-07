@@ -39,8 +39,8 @@ import { useDialogState } from "../hooks/use-dialog-state";
 export const Route = createFileRoute("/")({
   component: HomePage,
   loader: async ({ context }) => {
-    context.queryClient.prefetchQuery(dashboardDataQueryOptions());
-    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
+    context.queryClient.prefetchQuery(homeAreasQueryOptions());
+    await context.queryClient.ensureQueryData(dashboardDataQueryOptions());
   },
 });
 

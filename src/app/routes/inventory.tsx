@@ -31,8 +31,8 @@ import { InventoryItemCard } from "../components/cards/inventory-item-card";
 export const Route = createFileRoute("/inventory")({
   component: InventoryPage,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(inventoryQueryOptions());
     context.queryClient.prefetchQuery(homeAreasQueryOptions());
+    await context.queryClient.ensureQueryData(inventoryQueryOptions());
   },
 });
 
