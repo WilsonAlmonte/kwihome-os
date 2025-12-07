@@ -4,6 +4,7 @@ import { cn } from "@app/lib/utils";
 import { Separator } from "@app/components/ui/separator";
 import { navItems } from "./nav-items";
 import { HousePlug } from "lucide-react";
+import { version } from "package.json";
 
 export function Sidebar() {
   const router = useRouterState();
@@ -63,7 +64,7 @@ export function Sidebar() {
       <div className="px-3 pb-4">
         <Separator className="mb-4 bg-sidebar-border" />
         <div className="px-3 text-xs text-muted-foreground">
-          Kwihome OS v0.1.0
+          Kwihome OS v{version}
         </div>
       </div>
     </aside>
