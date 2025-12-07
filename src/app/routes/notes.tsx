@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  FileText,
-  Plus,
-  Trash2,
-  Edit,
-  MapPin,
-  Calendar,
-  Search,
-} from "lucide-react";
+import { Plus, Trash2, Edit, MapPin, Calendar, Search } from "lucide-react";
 import { Card, CardContent } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
@@ -22,6 +14,7 @@ import {
   useNoteUpdate,
   useNoteDeletion,
 } from "../features/notes/notes.hooks";
+import { NotesEmpty } from "../features/notes/notes-empty";
 import { useMediaQuery } from "../hooks/use-media-query";
 import type { Note, NoteInput } from "@repo/features/notes/note.entity";
 import { NoteForm } from "@app/components/forms";
@@ -196,34 +189,17 @@ function NotesPage() {
 
       {/* Notes List */}
       {filteredNotes.length === 0 && notes.length === 0 && (
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-500/10 mb-4">
-              <FileText className="h-7 w-7 text-rose-700" />
-            </div>
-            <h3 className="font-semibold mb-1">No notes yet</h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-[300px]">
-              Jot down important details like WiFi passwords, appliance manuals,
-              emergency contacts, or maintenance schedules.
-            </p>
-            <Button
-              onClick={() => setIsCreateDialogOpen(true)}
-              size="sm"
-              className="gap-1.5"
-            >
-              <Plus className="h-4 w-4" />
-              Create your first note
-            </Button>
-          </CardContent>
-        </Card>
+        <NotesEmpty
+          onCreateNote={() => setIsCreateDialogOpen(true)}
+          isFirstNote={true}
+        />
       )}
 
       {filteredNotes.length === 0 && notes.length > 0 && (
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-muted-foreground">No notes match your filters</p>
-          </CardContent>
-        </Card>
+        <NotesEmpty
+          onCreateNote={() => setIsCreateDialogOpen(true)}
+          isFirstNote={false}
+        />
       )}
 
       {/* Grid layout for notes */}

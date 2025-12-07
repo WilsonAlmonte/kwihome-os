@@ -2,7 +2,6 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
-  Package,
   Plus,
   Circle,
   CheckCircle2,
@@ -26,6 +25,7 @@ import {
   useToggleInventoryStatus,
   useMarkAsNotNeeded,
 } from "../features/inventory/inventory.hooks";
+import { InventoryEmpty } from "../features/inventory/inventory-empty";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { useDialogState } from "../hooks/use-dialog-state";
 import {
@@ -401,38 +401,14 @@ function InventoryPage() {
           {filteredItems.length > 0 ? (
             <div className="space-y-2">{filteredItems.map(renderItem)}</div>
           ) : (
-            <Card className="border-dashed border-2">
-              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <Package className="h-12 w-12 text-muted-foreground mb-3" />
-                <h3 className="font-semibold mb-1">No items found</h3>
-                <p className="text-sm text-muted-foreground">
-                  No items match the selected filter.
-                </p>
-              </CardContent>
-            </Card>
+            <InventoryEmpty
+              onAddItem={() => addDialog.open()}
+              isFirstItem={false}
+            />
           )}
         </div>
       ) : (
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
-              <Package className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="font-semibold mb-1">No items yet</h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-[300px]">
-              Start building your inventory by adding items you regularly
-              purchase.
-            </p>
-            <Button
-              size="sm"
-              className="gap-1.5"
-              onClick={() => addDialog.open()}
-            >
-              <Plus className="h-4 w-4" />
-              Add your first item
-            </Button>
-          </CardContent>
-        </Card>
+        <InventoryEmpty onAddItem={() => addDialog.open()} isFirstItem={true} />
       )}
     </div>
   );

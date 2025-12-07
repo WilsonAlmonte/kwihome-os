@@ -24,6 +24,7 @@ import { useMediaQuery } from "@app/hooks/use-media-query";
 import { shoppingListQueryOptions } from "@app/features/shopping-lists/shopping-lists.query";
 import { inventoryQueryOptions } from "@app/features/inventory/inventory.query";
 import { homeAreasQueryOptions } from "@app/features/home-areas/home-areas.query";
+import { ShoppingListEmpty } from "@app/features/shopping-lists/shopping-list-empty";
 import {
   useAddShoppingListItem,
   useRemoveShoppingListItem,
@@ -326,26 +327,7 @@ function ShoppingPage() {
           </p>
         </div>
 
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
-              <ShoppingCart className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="font-semibold mb-1">No items to shop for</h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-[300px]">
-              Add items to your shopping list or mark inventory items as out of
-              stock.
-            </p>
-            <Button
-              size="sm"
-              className="gap-1.5"
-              onClick={() => setAddDialogOpen(true)}
-            >
-              <Plus className="h-4 w-4" />
-              Add items
-            </Button>
-          </CardContent>
-        </Card>
+        <ShoppingListEmpty onAddItems={() => setAddDialogOpen(true)} />
 
         {/* Add Item Dialog */}
         <ResponsiveDialog

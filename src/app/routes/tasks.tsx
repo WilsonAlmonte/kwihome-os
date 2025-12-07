@@ -2,7 +2,6 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
-  CheckSquare,
   Plus,
   Circle,
   CheckCircle2,
@@ -26,6 +25,7 @@ import {
   useMarkTaskComplete,
   useMarkTaskPending,
 } from "../features/tasks/tasks.hooks";
+import { TasksEmpty } from "../features/tasks/tasks-empty";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Task } from "@repo/features/tasks/task.entity";
 import { useDialogState } from "../hooks/use-dialog-state";
@@ -299,26 +299,10 @@ function TasksPage() {
               <div className="space-y-2">{activeTasks.map(renderTask)}</div>
             </section>
           ) : (
-            <Card className="border-dashed border-2">
-              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
-                  <CheckSquare className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-1">No active tasks</h3>
-                <p className="text-sm text-muted-foreground mb-4 max-w-[300px]">
-                  All tasks are completed! Add new tasks to keep track of
-                  household chores and maintenance.
-                </p>
-                <Button
-                  size="sm"
-                  className="gap-1.5"
-                  onClick={() => addDialog.open()}
-                >
-                  <Plus className="h-4 w-4" />
-                  Add a task
-                </Button>
-              </CardContent>
-            </Card>
+            <TasksEmpty
+              onAddTask={() => addDialog.open()}
+              hasActiveTasks={true}
+            />
           )}
 
           {/* Completed Tasks */}
@@ -347,26 +331,7 @@ function TasksPage() {
           )}
         </div>
       ) : (
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
-              <CheckSquare className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="font-semibold mb-1">No tasks yet</h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-[300px]">
-              Add tasks to stay on top of household chores, maintenance, or
-              anything else that needs to get done.
-            </p>
-            <Button
-              size="sm"
-              className="gap-1.5"
-              onClick={() => addDialog.open()}
-            >
-              <Plus className="h-4 w-4" />
-              Add your first task
-            </Button>
-          </CardContent>
-        </Card>
+        <TasksEmpty onAddTask={() => addDialog.open()} isFirstTask={true} />
       )}
     </div>
   );
