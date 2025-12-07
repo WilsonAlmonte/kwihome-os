@@ -1,20 +1,10 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  Plus,
-  Circle,
-  CheckCircle2,
-  Trash2,
-  ChevronDown,
-  MapPin,
-  Edit,
-} from "lucide-react";
-import { Card, CardContent } from "@app/components/ui/card";
+import { Plus, ChevronDown } from "lucide-react";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
 import { ConfirmationDialog } from "@app/components/ui/confirmation-dialog";
-import { Swipeable } from "@app/components/ui/swipeable";
 import { toast } from "sonner";
 import { tasksQueryOptions } from "../features/tasks/task.query";
 import { homeAreasQueryOptions } from "../features/home-areas/home-areas.query";
@@ -26,23 +16,22 @@ import {
   useMarkTaskPending,
 } from "../features/tasks/tasks.hooks";
 import { TasksEmpty } from "../features/tasks/tasks-empty";
-import { useMediaQuery } from "../hooks/use-media-query";
 import { Task } from "@repo/features/tasks/task.entity";
 import { useDialogState } from "../hooks/use-dialog-state";
 import { TaskForm, TaskFormData } from "../components/forms/task-form";
+import { TaskItemCard } from "../components/cards/task-item-card";
 
 export const Route = createFileRoute("/tasks")({
   component: TasksPage,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(tasksQueryOptions());
-    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
+    context.queryClient.prefetchQuery(homeAreasQueryOptions());
   },
 });
 
 function TasksPage() {
   const { data: tasks } = useSuspenseQuery(tasksQueryOptions());
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
-  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const [showCompleted, setShowCompleted] = useState(false);
   const addDialog = useDialogState<Task>();
@@ -133,104 +122,6 @@ function TasksPage() {
     }
   };
 
-  const renderTask = (task: Task) => {
-    const cardContent = (
-      <Card
-        className="transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
-        onClick={() => addDialog.open(task)}
-      >
-        <CardContent className="flex items-start gap-2 p-3 md:gap-3 md:p-4">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleComplete(task);
-            }}
-            className="shrink-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer p-0.5 -m-0.5 hover:bg-accent rounded-md md:p-1 md:-m-1"
-          >
-            {task.completed ? (
-              <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-            ) : (
-              <Circle className="h-5 w-5 md:h-6 md:w-6" />
-            )}
-          </button>
-
-          <div className="flex-1 min-w-0">
-            <h3
-              className={`font-medium wrap-break-word text-sm md:text-base ${
-                task.completed ? "line-through text-muted-foreground" : ""
-              }`}
-            >
-              {task.title}
-            </h3>
-            {task.description && (
-              <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap wrap-break-word">
-                {task.description}
-              </p>
-            )}
-            {task.homeArea && (
-              <div className="flex items-center gap-1 mt-1.5 md:mt-2 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3" />
-                <span>{task.homeArea.name}</span>
-              </div>
-            )}
-            {task.completed && task.completedAt && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Completed on {new Date(task.completedAt).toLocaleDateString()} @{" "}
-                {new Date(task.completedAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            )}
-          </div>
-
-          {!isMobile && (
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addDialog.open(task);
-                }}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteDialog.open(task);
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-
-    return isMobile ? (
-      <Swipeable
-        key={task.id}
-        onSwipeLeft={() => deleteDialog.open(task)}
-        leftAction={
-          <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
-            <Trash2 className="h-5 w-5 text-destructive-foreground" />
-          </div>
-        }
-      >
-        {cardContent}
-      </Swipeable>
-    ) : (
-      <div key={task.id}>{cardContent}</div>
-    );
-  };
-
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -296,7 +187,17 @@ function TasksPage() {
                   ({activeTasks.length})
                 </span>
               </h2>
-              <div className="space-y-2">{activeTasks.map(renderTask)}</div>
+              <div className="space-y-2">
+                {activeTasks.map((task) => (
+                  <TaskItemCard
+                    key={task.id}
+                    task={task}
+                    openAddDialog={addDialog.open}
+                    openDeleteDialog={deleteDialog.open}
+                    handleToggleComplete={handleToggleComplete}
+                  />
+                ))}
+              </div>
             </section>
           ) : (
             <TasksEmpty
@@ -324,7 +225,15 @@ function TasksPage() {
               </button>
               {showCompleted && (
                 <div className="space-y-2">
-                  {completedTasks.map(renderTask)}
+                  {completedTasks.map((task) => (
+                    <TaskItemCard
+                      key={task.id}
+                      task={task}
+                      openAddDialog={addDialog.open}
+                      openDeleteDialog={deleteDialog.open}
+                      handleToggleComplete={handleToggleComplete}
+                    />
+                  ))}
                 </div>
               )}
             </section>

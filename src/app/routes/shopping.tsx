@@ -4,11 +4,6 @@ import { toast } from "sonner";
 import {
   ShoppingCart,
   Plus,
-  MapPin,
-  Package,
-  Trash2,
-  CheckCircle2,
-  Circle,
   PlayCircle,
   PartyPopper,
   XCircle,
@@ -17,7 +12,6 @@ import { Card, CardContent } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
 import { ConfirmationDialog } from "@app/components/ui/confirmation-dialog";
-import { Swipeable } from "@app/components/ui/swipeable";
 import { ShoppingListItemForm } from "@app/components/forms";
 import { useMediaQuery } from "@app/hooks/use-media-query";
 import { shoppingListQueryOptions } from "@app/features/shopping-lists/shopping-lists.query";
@@ -46,8 +40,8 @@ export const Route = createFileRoute("/shopping")({
   component: ShoppingPage,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(shoppingListQueryOptions());
-    await context.queryClient.ensureQueryData(inventoryQueryOptions());
-    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
+    context.queryClient.prefetchQuery(inventoryQueryOptions());
+    context.queryClient.prefetchQuery(homeAreasQueryOptions());
   },
 });
 

@@ -24,7 +24,7 @@ export const Route = createFileRoute("/notes")({
   component: NotesPage,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(notesQueryOptions());
-    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
+    context.queryClient.prefetchQuery(homeAreasQueryOptions());
   },
 });
 

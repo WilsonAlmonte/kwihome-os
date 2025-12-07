@@ -41,7 +41,7 @@ export const Route = createFileRoute("/inventory")({
   component: InventoryPage,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(inventoryQueryOptions());
-    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
+    context.queryClient.prefetchQuery(homeAreasQueryOptions());
   },
 });
 
