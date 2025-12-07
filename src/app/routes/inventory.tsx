@@ -1,20 +1,10 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  Plus,
-  Circle,
-  CheckCircle2,
-  Trash2,
-  MapPin,
-  Edit,
-  XCircle,
-} from "lucide-react";
-import { Card, CardContent } from "@app/components/ui/card";
+import { Plus } from "lucide-react";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
 import { ConfirmationDialog } from "@app/components/ui/confirmation-dialog";
-import { Swipeable } from "@app/components/ui/swipeable";
 import { toast } from "sonner";
 import { inventoryQueryOptions } from "../features/inventory/inventory.query";
 import { homeAreasQueryOptions } from "../features/home-areas/home-areas.query";
@@ -26,7 +16,6 @@ import {
   useMarkAsNotNeeded,
 } from "../features/inventory/inventory.hooks";
 import { InventoryEmpty } from "../features/inventory/inventory-empty";
-import { useMediaQuery } from "../hooks/use-media-query";
 import { useDialogState } from "../hooks/use-dialog-state";
 import {
   InventoryItem,
@@ -36,6 +25,7 @@ import {
   InventoryForm,
   InventoryFormData,
 } from "../components/forms/inventory-form";
+import { InventoryItemCard } from "../components/cards/inventory-item-card";
 
 export const Route = createFileRoute("/inventory")({
   component: InventoryPage,
@@ -48,7 +38,6 @@ export const Route = createFileRoute("/inventory")({
 function InventoryPage() {
   const { data: items } = useSuspenseQuery(inventoryQueryOptions());
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
-  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const [filterStatus, setFilterStatus] = useState<"all" | InventoryStatus>(
     "all"
@@ -170,124 +159,6 @@ function InventoryPage() {
     }
   };
 
-  const getStatusBadge = (status: InventoryStatus) => {
-    switch (status) {
-      case InventoryStatus.IN_STOCK:
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success dark:bg-success/50 dark:text-green-400">
-            <CheckCircle2 className="h-3 w-3" />
-            In Stock
-          </span>
-        );
-      case InventoryStatus.OUT_OF_STOCK:
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-destructive/10 text-red-800 dark:bg-destructive/50 dark:text-red-400">
-            <XCircle className="h-3 w-3" />
-            Out of Stock
-          </span>
-        );
-      case InventoryStatus.NOT_NEEDED:
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">
-            <Circle className="h-3 w-3" />
-            Not Needed
-          </span>
-        );
-    }
-  };
-
-  const renderItem = (item: InventoryItem) => {
-    const cardContent = (
-      <Card
-        className="transition-all hover:shadow-sm hover:border-primary/50 cursor-pointer"
-        onClick={() => addDialog.open(item)}
-      >
-        <CardContent className="flex items-start gap-2 p-3 md:gap-3 md:p-4">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (item.status !== InventoryStatus.NOT_NEEDED) {
-                handleToggleStatus(item);
-              }
-            }}
-            className={`shrink-0 text-muted-foreground hover:text-primary transition-colors p-0.5 -m-0.5 hover:bg-accent rounded-md md:p-1 md:-m-1 ${
-              item.status === InventoryStatus.NOT_NEEDED
-                ? "cursor-default opacity-50"
-                : "cursor-pointer"
-            }`}
-            disabled={item.status === InventoryStatus.NOT_NEEDED}
-          >
-            {item.status === InventoryStatus.IN_STOCK ? (
-              <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-success" />
-            ) : item.status === InventoryStatus.OUT_OF_STOCK ? (
-              <XCircle className="h-5 w-5 md:h-6 md:w-6 text-destructive" />
-            ) : (
-              <Circle className="h-5 w-5 md:h-6 md:w-6" />
-            )}
-          </button>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-medium wrap-break-word text-sm md:text-base">
-                {item.name}
-              </h3>
-              {getStatusBadge(item.status)}
-            </div>
-            {item.homeArea && (
-              <div className="flex items-center gap-1 mt-1.5 md:mt-2 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3" />
-                <span>{item.homeArea.name}</span>
-              </div>
-            )}
-          </div>
-
-          {!isMobile && (
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addDialog.open(item);
-                }}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteDialog.open(item);
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-
-    return isMobile ? (
-      <Swipeable
-        key={item.id}
-        onSwipeLeft={() => deleteDialog.open(item)}
-        leftAction={
-          <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
-            <Trash2 className="h-5 w-5 text-destructive-foreground" />
-          </div>
-        }
-      >
-        {cardContent}
-      </Swipeable>
-    ) : (
-      <div key={item.id}>{cardContent}</div>
-    );
-  };
-
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -399,7 +270,17 @@ function InventoryPage() {
 
           {/* Items List */}
           {filteredItems.length > 0 ? (
-            <div className="space-y-2">{filteredItems.map(renderItem)}</div>
+            <div className="space-y-2">
+              {filteredItems.map((item) => (
+                <InventoryItemCard
+                  key={item.id}
+                  item={item}
+                  openAddDialog={addDialog.open}
+                  openDeleteDialog={deleteDialog.open}
+                  handleToggleStatus={handleToggleStatus}
+                />
+              ))}
+            </div>
           ) : (
             <InventoryEmpty
               onAddItem={() => addDialog.open()}
