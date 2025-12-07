@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  FileText,
-  Plus,
-  Trash2,
-  Edit,
-  MapPin,
-  Calendar,
-  Search,
-} from "lucide-react";
+import { Plus, Trash2, Edit, MapPin, Calendar, Search } from "lucide-react";
 import { Card, CardContent } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
@@ -22,30 +14,27 @@ import {
   useNoteUpdate,
   useNoteDeletion,
 } from "../features/notes/notes.hooks";
+import { NotesEmpty } from "../features/notes/notes-empty";
 import { useMediaQuery } from "../hooks/use-media-query";
 import type { Note, NoteInput } from "@repo/features/notes/note.entity";
 import { NoteForm } from "@app/components/forms";
+import { useDialogState } from "../hooks/use-dialog-state";
 
 export const Route = createFileRoute("/notes")({
   component: NotesPage,
   loader: async ({ context }) => {
+    context.queryClient.prefetchQuery(homeAreasQueryOptions());
     await context.queryClient.ensureQueryData(notesQueryOptions());
-    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
   },
 });
 
 function NotesPage() {
   const { data: notes } = useSuspenseQuery(notesQueryOptions());
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const createDialog = useDialogState();
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
-  const [deleteDialogProps, setDeleteDialogProps] = useState<{
-    isOpen: boolean;
-    note?: Note;
-  }>({
-    isOpen: false,
-  });
+  const deleteDialog = useDialogState<Note>();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAreaFilters, setSelectedAreaFilters] = useState<Set<string>>(
     new Set(["all"])
@@ -60,7 +49,7 @@ function NotesPage() {
   const handleCreateNote = async (data: NoteInput) => {
     try {
       await createNoteMutation.mutateAsync(data);
-      setIsCreateDialogOpen(false);
+      createDialog.close();
     } catch (error) {
       console.error("Failed to create note:", error);
     }
@@ -78,13 +67,13 @@ function NotesPage() {
   };
 
   const handleDeleteNote = async () => {
-    if (!deleteDialogProps.note) return;
+    if (!deleteDialog.data) return;
 
     try {
-      await deleteNoteMutation.mutateAsync(deleteDialogProps.note.id);
+      await deleteNoteMutation.mutateAsync(deleteDialog.data.id);
       setViewingNote(null);
       setEditingNote(null);
-      setDeleteDialogProps({ isOpen: false, note: undefined });
+      deleteDialog.close();
     } catch (error) {
       console.error("Failed to delete note:", error);
     }
@@ -141,7 +130,7 @@ function NotesPage() {
             Save important information about your home
           </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-1.5">
+        <Button onClick={() => createDialog.open()} className="gap-1.5">
           <Plus className="h-4 w-4" />
           {isDesktop && "Add Note"}
         </Button>
@@ -200,43 +189,23 @@ function NotesPage() {
 
       {/* Notes List */}
       {filteredNotes.length === 0 && notes.length === 0 && (
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-500/10 mb-4">
-              <FileText className="h-7 w-7 text-rose-700" />
-            </div>
-            <h3 className="font-semibold mb-1">No notes yet</h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-[300px]">
-              Jot down important details like WiFi passwords, appliance manuals,
-              emergency contacts, or maintenance schedules.
-            </p>
-            <Button
-              onClick={() => setIsCreateDialogOpen(true)}
-              size="sm"
-              className="gap-1.5"
-            >
-              <Plus className="h-4 w-4" />
-              Create your first note
-            </Button>
-          </CardContent>
-        </Card>
+        <NotesEmpty
+          onCreateNote={() => createDialog.open()}
+          isFirstNote={true}
+        />
       )}
 
       {filteredNotes.length === 0 && notes.length > 0 && (
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-muted-foreground">No notes match your filters</p>
-          </CardContent>
-        </Card>
+        <NotesEmpty
+          onCreateNote={() => createDialog.open()}
+          isFirstNote={false}
+        />
       )}
 
       {/* Grid layout for notes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredNotes.map((note) => (
-          <Swipeable
-            key={note.id}
-            onSwipeLeft={() => setDeleteDialogProps({ isOpen: true, note })}
-          >
+          <Swipeable key={note.id} onSwipeLeft={() => deleteDialog.open(note)}>
             <Card
               className="cursor-pointer hover:shadow-md transition-shadow h-full"
               onClick={() => setViewingNote(note)}
@@ -275,15 +244,17 @@ function NotesPage() {
 
       {/* Create Dialog */}
       <ResponsiveDialog
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
+        open={createDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? createDialog.open() : createDialog.close()
+        }
         title="Create Note"
         maxWidth="sm:max-w-[700px]"
       >
         <NoteForm
           homeAreas={homeAreas}
           onSubmit={handleCreateNote}
-          onCancel={() => setIsCreateDialogOpen(false)}
+          onCancel={() => createDialog.close()}
           isSubmitting={createNoteMutation.isPending}
         />
       </ResponsiveDialog>
@@ -351,7 +322,7 @@ function NotesPage() {
               <Button
                 variant="destructive"
                 onClick={() => {
-                  setDeleteDialogProps({ isOpen: true, note: viewingNote });
+                  deleteDialog.open(viewingNote);
                   setViewingNote(null);
                 }}
                 className="gap-1.5 flex-1"
@@ -366,16 +337,16 @@ function NotesPage() {
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
-        open={deleteDialogProps.isOpen}
-        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? deleteDialog.open() : deleteDialog.close()
+        }
         title="Delete Note"
-        description={`Are you sure you want to delete "${deleteDialogProps.note?.title}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete "${deleteDialog.data?.title}"? This action cannot be undone.`}
         confirmLabel="Delete"
         variant="destructive"
         onConfirm={handleDeleteNote}
-        onCancel={() =>
-          setDeleteDialogProps({ isOpen: false, note: undefined })
-        }
+        onCancel={() => deleteDialog.close()}
         isLoading={deleteNoteMutation.isPending}
       />
     </div>

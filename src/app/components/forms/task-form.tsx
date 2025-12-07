@@ -1,38 +1,32 @@
+import { HomeArea } from "@repo/features/home-areas/home-area.entity";
+import { Task, taskSchema } from "@repo/features/tasks/task.entity";
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
-import {
-  Field,
-  FieldError,
-  Input,
-  HomeAreaSelector,
-  FormActions,
-} from "@app/components/forms";
-import { RichTextEditor } from "@app/components/ui/rich-text-editor";
-import type { Note } from "@repo/features/notes/note.entity";
-import { noteSchema } from "@repo/features/notes/note.entity";
-import type { HomeArea } from "@repo/features/home-areas/home-area.entity";
+import z from "zod";
+import { Field, FieldError } from "../ui/field";
+import { Input } from "../ui/input";
+import { HomeAreaSelector } from "./home-area-selector";
+import { FormActions } from "./form-actions";
 
-type NoteFormData = z.infer<typeof noteSchema>;
+export type TaskFormData = z.infer<typeof taskSchema>;
 
-interface NoteFormProps {
-  initialData?: Note;
+interface TaskFormProps {
+  initialData?: Task;
   homeAreas: HomeArea[];
-  onSubmit: (data: NoteFormData) => void | Promise<void>;
+  onSubmit: (data: TaskFormData) => void | Promise<void>;
   onCancel?: () => void;
   isSubmitting?: boolean;
 }
-
-export function NoteForm({
+export function TaskForm({
   initialData,
   homeAreas,
   onSubmit,
   onCancel,
   isSubmitting = false,
-}: NoteFormProps) {
+}: TaskFormProps) {
   const form = useForm({
     defaultValues: {
       title: initialData?.title ?? "",
-      content: initialData?.content ?? "",
+      description: initialData?.description ?? "",
       homeAreaId: initialData?.homeArea?.id ?? "",
     },
     onSubmit: async ({ value }) => {
@@ -52,7 +46,7 @@ export function NoteForm({
       <form.Field
         name="title"
         validators={{
-          onChange: noteSchema.shape.title,
+          onChange: taskSchema.shape.title,
         }}
       >
         {(field) => (
@@ -63,7 +57,7 @@ export function NoteForm({
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="e.g., WiFi Password, Recipe, Instructions"
+              placeholder="e.g., Clean the kitchen, Fix leaky faucet"
               disabled={isSubmitting}
               aria-invalid={field.state.meta.errors.length > 0}
             />
@@ -72,19 +66,19 @@ export function NoteForm({
         )}
       </form.Field>
 
-      <form.Field
-        name="content"
-        validators={{
-          onChange: noteSchema.shape.content,
-        }}
-      >
+      <form.Field name="description">
         {(field) => (
           <Field>
-            <RichTextEditor
-              content={field.state.value}
-              onChange={(value) => field.handleChange(value)}
-              placeholder="Write your note content here..."
+            <textarea
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              placeholder="Add any additional details..."
               disabled={isSubmitting}
+              className="flex min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              rows={3}
             />
             <FieldError errors={field.state.meta.errors} />
           </Field>
@@ -111,7 +105,7 @@ export function NoteForm({
             onCancel={onCancel}
             canSubmit={canSubmit as boolean}
             isSubmitting={isSubmitting || (isSubmittingForm as boolean)}
-            submitLabel={initialData ? "Update Note" : "Create Note"}
+            submitLabel={initialData ? "Update Task" : "Create Task"}
           />
         )}
       </form.Subscribe>

@@ -1,15 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { toast } from "sonner";
 import {
   ShoppingCart,
   Plus,
-  MapPin,
-  Package,
-  Trash2,
-  CheckCircle2,
-  Circle,
   PlayCircle,
   PartyPopper,
   XCircle,
@@ -18,12 +12,12 @@ import { Card, CardContent } from "@app/components/ui/card";
 import { Button } from "@app/components/ui/button";
 import { ResponsiveDialog } from "@app/components/ui/responsive-dialog";
 import { ConfirmationDialog } from "@app/components/ui/confirmation-dialog";
-import { Swipeable } from "@app/components/ui/swipeable";
 import { ShoppingListItemForm } from "@app/components/forms";
 import { useMediaQuery } from "@app/hooks/use-media-query";
 import { shoppingListQueryOptions } from "@app/features/shopping-lists/shopping-lists.query";
 import { inventoryQueryOptions } from "@app/features/inventory/inventory.query";
 import { homeAreasQueryOptions } from "@app/features/home-areas/home-areas.query";
+import { ShoppingListEmpty } from "@app/features/shopping-lists/shopping-list-empty";
 import {
   useAddShoppingListItem,
   useRemoveShoppingListItem,
@@ -38,14 +32,19 @@ import {
   ShoppingListStatus,
   CreateShoppingListItemInput,
 } from "@repo/features/shopping-lists/shopping-list.entity";
-import { InventoryStatus } from "@repo/features/inventory/inventory-item.entity";
+import {
+  InventoryItem,
+  InventoryStatus,
+} from "@repo/features/inventory/inventory-item.entity";
+import { useDialogState } from "../hooks/use-dialog-state";
+import { ShoppingItemCard } from "../components/cards/shopping-item-card";
 
 export const Route = createFileRoute("/shopping")({
   component: ShoppingPage,
   loader: async ({ context }) => {
+    context.queryClient.prefetchQuery(homeAreasQueryOptions());
+    context.queryClient.prefetchQuery(inventoryQueryOptions());
     await context.queryClient.ensureQueryData(shoppingListQueryOptions());
-    await context.queryClient.ensureQueryData(inventoryQueryOptions());
-    await context.queryClient.ensureQueryData(homeAreasQueryOptions());
   },
 });
 
@@ -55,14 +54,11 @@ function ShoppingPage() {
   const { data: homeAreas } = useSuspenseQuery(homeAreasQueryOptions());
   const isMobile = useMediaQuery("(max-width: 1023px)");
 
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [deleteDialogProps, setDeleteDialogProps] = useState<{
-    isOpen: boolean;
-    item?: ShoppingListItem;
-  }>({ isOpen: false });
-  const [abandonDialogOpen, setAbandonDialogOpen] = useState(false);
-  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const addDialog = useDialogState();
+  const deleteDialog = useDialogState<ShoppingListItem>();
+  const abandonDialog = useDialogState();
+  const completeDialog = useDialogState();
+  const cancelDialog = useDialogState();
 
   const addItem = useAddShoppingListItem();
   const removeItem = useRemoveShoppingListItem();
@@ -119,17 +115,17 @@ function ShoppingPage() {
   };
 
   const handleRemoveItem = async () => {
-    if (!deleteDialogProps.item) return;
+    if (!deleteDialog.data) return;
 
     try {
       await removeItem.mutateAsync({
-        itemId: deleteDialogProps.item.id,
+        itemId: deleteDialog.data.id,
         listId: shoppingList.id,
       });
       toast.success("Item removed", {
-        description: `${deleteDialogProps.item.name} has been removed.`,
+        description: `${deleteDialog.data.name} has been removed.`,
       });
-      setDeleteDialogProps({ isOpen: false });
+      deleteDialog.close();
     } catch (error) {
       toast.error("Failed to remove item", {
         description: "Please try again.",
@@ -170,7 +166,7 @@ function ShoppingPage() {
       toast.success("Shopping complete!", {
         description: `${checkedCount} items marked as in stock.`,
       });
-      setCompleteDialogOpen(false);
+      completeDialog.close();
     } catch (error) {
       toast.error("Failed to complete shopping", {
         description: "Please try again.",
@@ -184,7 +180,7 @@ function ShoppingPage() {
       toast.success("Draft cleared", {
         description: "Your shopping list has been cleared.",
       });
-      setAbandonDialogOpen(false);
+      abandonDialog.close();
     } catch (error) {
       toast.error("Failed to clear list", {
         description: "Please try again.",
@@ -198,7 +194,7 @@ function ShoppingPage() {
       toast.success("Shopping trip cancelled", {
         description: "Your list has been returned to draft mode.",
       });
-      setCancelDialogOpen(false);
+      cancelDialog.close();
     } catch (error) {
       toast.error("Failed to cancel shopping", {
         description: "Please try again.",
@@ -206,165 +202,16 @@ function ShoppingPage() {
     }
   };
 
-  const renderItem = (item: ShoppingListItem) => {
-    // Compact view for active shopping mode
-    if (isActive) {
-      return (
-        <div key={item.id}>
-          <Card
-            className={`transition-all cursor-pointer ${
-              item.checked
-                ? "bg-muted/50 border-muted"
-                : "hover:shadow-sm hover:border-primary/50"
-            }`}
-            onClick={() => handleToggleChecked(item)}
-          >
-            <CardContent className="flex items-center gap-2 px-2 md:p-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleChecked(item);
-                }}
-                className="shrink-0"
-              >
-                {item.checked ? (
-                  <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-success" />
-                ) : (
-                  <Circle className="h-5 w-5 md:h-6 md:w-6 text-muted-foreground hover:text-primary transition-colors" />
-                )}
-              </button>
-              <span
-                className={`text-sm md:text-base ${
-                  item.checked ? "line-through text-muted-foreground" : ""
-                }`}
-              >
-                {item.name}
-              </span>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
-
-    // Full view for draft mode
-    const cardContent = (
-      <Card
-        className={`transition-all ${
-          item.checked
-            ? "bg-muted/50 border-muted"
-            : "hover:shadow-sm hover:border-primary/50"
-        }`}
-      >
-        <CardContent className="flex items-center gap-3 p-3 md:p-4">
-          <div className="shrink-0">
-            {item.inventoryItem ? (
-              <Package className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <ShoppingCart className="h-5 w-5 text-muted-foreground" />
-            )}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm md:text-base">{item.name}</h3>
-            <div className="flex items-center gap-2 mt-0.5">
-              {item.homeArea && (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  {item.homeArea.name}
-                </span>
-              )}
-              {item.inventoryItem && (
-                <span className="text-xs text-muted-foreground">
-                  • From inventory
-                </span>
-              )}
-            </div>
-          </div>
-
-          {isDraft && !isMobile && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground hover:text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                setDeleteDialogProps({ isOpen: true, item });
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    );
-
-    if (isDraft && isMobile) {
-      return (
-        <Swipeable
-          key={item.id}
-          onSwipeLeft={() => setDeleteDialogProps({ isOpen: true, item })}
-          leftAction={
-            <div className="w-full h-full bg-destructive flex items-center justify-center rounded-xl">
-              <Trash2 className="h-5 w-5 text-destructive-foreground" />
-            </div>
-          }
-        >
-          {cardContent}
-        </Swipeable>
-      );
-    }
-
-    return <div key={item.id}>{cardContent}</div>;
-  };
-
   // Empty state
   if (shoppingList.items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Shopping</h1>
-          <p className="text-muted-foreground mt-1">
-            Create and manage your shopping lists
-          </p>
-        </div>
-
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
-              <ShoppingCart className="h-7 w-7 text-primary" />
-            </div>
-            <h3 className="font-semibold mb-1">No items to shop for</h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-[300px]">
-              Add items to your shopping list or mark inventory items as out of
-              stock.
-            </p>
-            <Button
-              size="sm"
-              className="gap-1.5"
-              onClick={() => setAddDialogOpen(true)}
-            >
-              <Plus className="h-4 w-4" />
-              Add items
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Add Item Dialog */}
-        <ResponsiveDialog
-          open={addDialogOpen}
-          onOpenChange={setAddDialogOpen}
-          title="Add Items"
-          description="Add items to your shopping list."
-        >
-          <ShoppingListItemForm
-            homeAreas={homeAreas}
-            inventoryItems={availableInventoryItems}
-            onSubmit={handleAddItem}
-            onCancel={() => setAddDialogOpen(false)}
-            isSubmitting={addItem.isPending}
-          />
-        </ResponsiveDialog>
-      </div>
+      <EmptyShoppingView
+        addDialog={addDialog}
+        homeAreas={homeAreas}
+        availableInventoryItems={availableInventoryItems}
+        handleAddItem={handleAddItem}
+        addItem={addItem}
+      />
     );
   }
 
@@ -386,7 +233,18 @@ function ShoppingPage() {
         {/* Items List */}
         <div className="space-y-2">
           {/* Unchecked items first */}
-          {shoppingList.items.filter((item) => !item.checked).map(renderItem)}
+          {shoppingList.items
+            .filter((item) => !item.checked)
+            .map((item) => (
+              <ShoppingItemCard
+                item={item}
+                isActive={isActive}
+                isDraft={isDraft}
+                isMobile={isMobile}
+                handleToggleChecked={handleToggleChecked}
+                openDeleteDialog={deleteDialog.open}
+              />
+            ))}
 
           {/* Checked items at bottom */}
           {checkedCount > 0 && (
@@ -400,7 +258,16 @@ function ShoppingPage() {
               </div>
               {shoppingList.items
                 .filter((item) => item.checked)
-                .map(renderItem)}
+                .map((item) => (
+                  <ShoppingItemCard
+                    item={item}
+                    isActive={isActive}
+                    isDraft={isDraft}
+                    isMobile={isMobile}
+                    handleToggleChecked={handleToggleChecked}
+                    openDeleteDialog={deleteDialog.open}
+                  />
+                ))}
             </>
           )}
         </div>
@@ -423,7 +290,7 @@ function ShoppingPage() {
             <Button
               size="lg"
               className="w-full gap-2 h-14 text-lg font-semibold"
-              onClick={() => setCompleteDialogOpen(true)}
+              onClick={() => completeDialog.open()}
             >
               <PartyPopper className="h-5 w-5" />
               I'M DONE!
@@ -431,7 +298,7 @@ function ShoppingPage() {
             <Button
               variant="ghost"
               className="w-full gap-2 text-muted-foreground"
-              onClick={() => setCancelDialogOpen(true)}
+              onClick={() => cancelDialog.open()}
             >
               <XCircle className="h-4 w-4" />
               Cancel Shopping
@@ -440,8 +307,10 @@ function ShoppingPage() {
         </div>
         {/* Complete Confirmation */}
         <ConfirmationDialog
-          open={completeDialogOpen}
-          onOpenChange={setCompleteDialogOpen}
+          open={completeDialog.isOpen}
+          onOpenChange={(open) =>
+            open ? completeDialog.open() : completeDialog.close()
+          }
           title="Complete Shopping Trip?"
           description={
             <div className="space-y-3">
@@ -467,8 +336,10 @@ function ShoppingPage() {
         />
         {/* Cancel Shopping Confirmation */}
         <ConfirmationDialog
-          open={cancelDialogOpen}
-          onOpenChange={setCancelDialogOpen}
+          open={cancelDialog.isOpen}
+          onOpenChange={(open) =>
+            open ? cancelDialog.open() : cancelDialog.close()
+          }
           title="Cancel Shopping Trip?"
           description="Your shopping trip will be cancelled and returned to draft mode. All items will be unchecked."
           confirmLabel="Cancel Trip"
@@ -496,7 +367,7 @@ function ShoppingPage() {
           size="sm"
           variant="outline"
           className="gap-1.5"
-          onClick={() => setAddDialogOpen(true)}
+          onClick={() => addDialog.open()}
         >
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">Add Items</span>
@@ -523,7 +394,18 @@ function ShoppingPage() {
       </Card>
 
       {/* Items List */}
-      <div className="space-y-2">{shoppingList.items.map(renderItem)}</div>
+      <div className="space-y-2">
+        {shoppingList.items.map((item) => (
+          <ShoppingItemCard
+            item={item}
+            isActive={isActive}
+            isDraft={isDraft}
+            isMobile={isMobile}
+            handleToggleChecked={handleToggleChecked}
+            openDeleteDialog={deleteDialog.open}
+          />
+        ))}
+      </div>
 
       {/* Clear List Button */}
       {!isVirtualDraft && (
@@ -531,7 +413,7 @@ function ShoppingPage() {
           <Button
             variant="ghost"
             className="w-full text-muted-foreground"
-            onClick={() => setAbandonDialogOpen(true)}
+            onClick={() => abandonDialog.open()}
           >
             <XCircle className="h-4 w-4 mr-2" />
             Clear List
@@ -541,8 +423,8 @@ function ShoppingPage() {
 
       {/* Add Items Dialog */}
       <ResponsiveDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
+        open={addDialog.isOpen}
+        onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}
         title="Add Items"
         description="Add an item to your shopping list."
       >
@@ -550,17 +432,19 @@ function ShoppingPage() {
           homeAreas={homeAreas}
           inventoryItems={availableInventoryItems}
           onSubmit={handleAddItem}
-          onCancel={() => setAddDialogOpen(false)}
+          onCancel={() => addDialog.close()}
           isSubmitting={addItem.isPending}
         />
       </ResponsiveDialog>
 
       {/* Delete Confirmation */}
       <ConfirmationDialog
-        open={deleteDialogProps.isOpen}
-        onOpenChange={(open) => setDeleteDialogProps({ isOpen: open })}
+        open={deleteDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? deleteDialog.open() : deleteDialog.close()
+        }
         title="Remove Item"
-        description={`Are you sure you want to remove "${deleteDialogProps.item?.name}" from your shopping list?`}
+        description={`Are you sure you want to remove "${deleteDialog.data?.name}" from your shopping list?`}
         confirmLabel="Remove"
         variant="destructive"
         onConfirm={handleRemoveItem}
@@ -569,8 +453,10 @@ function ShoppingPage() {
 
       {/* Abandon Draft Confirmation */}
       <ConfirmationDialog
-        open={abandonDialogOpen}
-        onOpenChange={setAbandonDialogOpen}
+        open={abandonDialog.isOpen}
+        onOpenChange={(open) =>
+          open ? abandonDialog.open() : abandonDialog.close()
+        }
         title="Clear Shopping List?"
         description="This will remove all items from your current shopping list. Items will remain in your inventory."
         confirmLabel="Clear"
@@ -578,6 +464,52 @@ function ShoppingPage() {
         onConfirm={handleAbandonDraft}
         isLoading={abandonDraft.isPending}
       />
+    </div>
+  );
+}
+
+interface EmptyShoppingViewProps {
+  addDialog: ReturnType<typeof useDialogState>;
+  homeAreas: Array<{ id: string; name: string }>;
+  availableInventoryItems: InventoryItem[];
+  handleAddItem: (data: CreateShoppingListItemInput) => Promise<void>;
+  addItem: {
+    isPending: boolean;
+  };
+}
+function EmptyShoppingView({
+  addDialog,
+  homeAreas,
+  availableInventoryItems,
+  handleAddItem,
+  addItem,
+}: EmptyShoppingViewProps) {
+  return (
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Shopping</h1>
+        <p className="text-muted-foreground mt-1">
+          Create and manage your shopping lists
+        </p>
+      </div>
+
+      <ShoppingListEmpty onAddItems={() => addDialog.open()} />
+
+      {/* Add Item Dialog */}
+      <ResponsiveDialog
+        open={addDialog.isOpen}
+        onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}
+        title="Add Items"
+        description="Add items to your shopping list."
+      >
+        <ShoppingListItemForm
+          homeAreas={homeAreas}
+          inventoryItems={availableInventoryItems}
+          onSubmit={handleAddItem}
+          onCancel={() => addDialog.close()}
+          isSubmitting={addItem.isPending}
+        />
+      </ResponsiveDialog>
     </div>
   );
 }

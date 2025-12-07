@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@app/lib/utils";
 import { Separator } from "@app/components/ui/separator";
 import { navItems } from "./nav-items";
+import { HousePlug } from "lucide-react";
 
 export function Sidebar() {
   const router = useRouterState();
@@ -12,8 +13,8 @@ export function Sidebar() {
     <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-sidebar-border bg-sidebar">
       <div className="flex h-16 items-center px-6 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="flex h-8 w-8 items-center font-heading justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-sm transition-transform group-hover:scale-105">
-            K
+          <div className="flex h-9 w-9 items-center font-heading justify-center rounded-lg bg-linear-30 from-primary to-primary/80 shadow-sm text-primary-foreground font-bold transition-transform group-hover:scale-105">
+            <HousePlug className="h-5 w-5 stroke-2" />
           </div>
           <span className="text-xl font-bold text-sidebar-foreground font-heading">
             Kwihome
