@@ -25,25 +25,27 @@ export const Route = createRootRouteWithContext<{
         content:
           "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
       },
-      // <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content"></meta>
       {
         title: "Kwihome Os",
       },
     ],
     links: [
+      // Preload self-hosted fonts for optimal performance
       {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
+        rel: "preload",
+        as: "font",
+        type: "font/ttf",
+        href: "/fonts/Inter-VariableFont_opsz,wght.ttf",
         crossOrigin: "anonymous",
       },
       {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap",
+        rel: "preload",
+        as: "font",
+        type: "font/ttf",
+        href: "/fonts/Outfit-VariableFont_wght.ttf",
+        crossOrigin: "anonymous",
       },
+      // Load app CSS (includes @font-face declarations)
       {
         rel: "stylesheet",
         href: appCss,
