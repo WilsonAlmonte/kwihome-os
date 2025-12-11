@@ -40,6 +40,10 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src/db/prisma ./src/db/prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
 # Set ownership
 RUN chown -R kwihome:nodejs /app
 
@@ -53,5 +57,5 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
-# Start the application
-CMD ["node", ".output/server/index.mjs"]
+# Start the application (runs migrations first)
+CMD ["./docker-entrypoint.sh"]

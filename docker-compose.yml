@@ -40,28 +40,6 @@ services:
     networks:
       - kwihome-network
 
-  # Optional: Run migrations automatically on startup
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: kwihome-migrate
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-kwihome}:${POSTGRES_PASSWORD:-kwihome}@db:5432/${POSTGRES_DB:-kwihome}?schema=public
-    depends_on:
-      db:
-        condition: service_healthy
-    command:
-      [
-        "npx",
-        "prisma",
-        "migrate",
-        "deploy",
-        "--schema=src/db/prisma/schema.prisma",
-      ]
-    networks:
-      - kwihome-network
-
 networks:
   kwihome-network:
     driver: bridge
